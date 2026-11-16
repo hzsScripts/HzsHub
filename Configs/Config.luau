@@ -1,6 +1,4 @@
-
 return {
-    -- OWNERS
     Owner = {
         [4756036428] = {
             Name = "Nzx",
@@ -23,7 +21,6 @@ return {
         Bio = "Hzs Hub | Whitelist",
     },
 
-    -- REMOTE DO JOGO
     RemoteTagName = "1RPNam1eTex1t",
     RemoteFolderName = "RE",
     TagFieldName = "RolePlayName",
@@ -32,12 +29,10 @@ return {
         Enabled = true,
     },
 
-    -- WHITELIST
     WhitelistConfig = {
-        ["Everyone Can Use?"] = "false",
+        ["Everyone Can Use?"] = false,
     },
 
-    -- NOTIFICAÇÕES
     NotificationConfig = {
         Duration = 7,
     },
@@ -64,19 +59,21 @@ return {
         BodyTextSize = 11,
     },
 
-    -- PROTEÇÕES
     AntiTagChange = {
         Enabled = true,
-        Text = "VOCÊ NÃO PODE MUDAR A TAG!",
+        Text = "VOCÊ NÃO PODE ALTERAR O NOME!",
     },
-AntiBioChange = { Enabled = true, Text = "VOCÊ NÃO PODE ALTERAR A BIO!" },
+
+    AntiBioChange = {
+        Enabled = true,
+        Text = "VOCÊ NÃO PODE ALTERAR A BIO!",
+    },
 
     AntiConfigChange = {
         Enabled = true,
         Text = "VOCÊ NÃO PODE ALTERAR A CONFIG!",
     },
 
-    -- KICK
     KickConfig = {
         KickMessage = "Acesso Negado\n\nVocê não está na whitelist deste Script.\nSolicite acesso ao administrador.",
         Delay = 5,
@@ -86,14 +83,12 @@ AntiBioChange = { Enabled = true, Text = "VOCÊ NÃO PODE ALTERAR A BIO!" },
         EnableLeaderKick = true,
     },
 
-    -- CARREGAMENTO
     Load = {
         WaitForGame = true,
         WaitForCharacter = true,
         RemoteTimeout = 60,
     },
 
-    -- RGB
     RGB = {
         Enabled = true,
         Speed = 7,
@@ -102,7 +97,6 @@ AntiBioChange = { Enabled = true, Text = "VOCÊ NÃO PODE ALTERAR A BIO!" },
         RainbowObject = true,
     },
 
-    -- TAG E BIO DOS USUÁRIOS
     UserTag = {
         Enabled = true,
         Text = "~ Hzs Hub | User",
@@ -115,7 +109,6 @@ AntiBioChange = { Enabled = true, Text = "VOCÊ NÃO PODE ALTERAR A BIO!" },
         Color = Color3.fromRGB(26, 196, 14),
     },
 
-    -- BILLBOARD
     BillboardTag = {
         Enabled = true,
         FirebaseOwnerText = "Hzs Hub | Owner",
@@ -130,7 +123,6 @@ AntiBioChange = { Enabled = true, Text = "VOCÊ NÃO PODE ALTERAR A BIO!" },
         StudsOffset = Vector3.new(0, 2.8, 0),
     },
 
-    -- AVISOS DE PROTEÇÃO
     Warning = {
         Duration = 10,
         Cooldown = 0.1,
