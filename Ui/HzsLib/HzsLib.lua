@@ -26,7 +26,7 @@ local redzlib = {
 		}
 	},
 	Info = {
-		Version = "1.1.0"
+		Version = "1.0.4"
 	},
 	Background = {
 		Url = "https://cdn.discordapp.com/attachments/1552055729450520656/1571244099737100318/f7d253ec8f25453ac387322c3061e848.jpg?ex=6afc00d9&is=6afaaf59&hm=fdf771354caea0fd29440c4de49eab24d49fa9da79c14ec308916d54a8900e9d&",
@@ -2598,8 +2598,9 @@ function redzlib:MakeWindow(Configs)
 		}), "DarkText")
 	}), "Text")
 	
+	local SearchH = 30 -- espaço da barra de pesquisa acima das abas
 	local MainScroll = InsertTheme(Create("ScrollingFrame", Components, {
-		Size = UDim2.new(0, redzlib.Save.TabSize, 1, -TopBar.Size.Y.Offset - 14),
+		Size = UDim2.new(0, redzlib.Save.TabSize, 1, -TopBar.Size.Y.Offset - 14 - SearchH),
 		ScrollBarImageColor3 = Theme["Color Theme"],
 		Position = UDim2.new(0, 0, 1, -14),
 		AnchorPoint = Vector2.new(0, 1),
@@ -2652,7 +2653,7 @@ function redzlib:MakeWindow(Configs)
 		ControlSize1.Position = UDim2.fromOffset(math.clamp(Pos1.X.Offset, 430, 1000), math.clamp(Pos1.Y.Offset, 200, 500))
 		ControlSize2.Position = UDim2.new(0, math.clamp(Pos2.X.Offset, 135, 250), 1, 0)
 		
-		MainScroll.Size = UDim2.new(0, ControlSize2.Position.X.Offset, 1, -TopBar.Size.Y.Offset - 14)
+		MainScroll.Size = UDim2.new(0, ControlSize2.Position.X.Offset, 1, -TopBar.Size.Y.Offset - 14 - SearchH)
 		Containers.Size = UDim2.new(1, -MainScroll.Size.X.Offset, 1, -TopBar.Size.Y.Offset - 14)
 		MainFrame.Size = ControlSize1.Position
 	end
@@ -2892,16 +2893,18 @@ function redzlib:MakeWindow(Configs)
 	local SearchQuery = ""
 	
 	-- ===== barra de pesquisa de componentes (topo) ===== --
-	local GlobalSearch = Create("Frame", TopBar, {
-		Size = UDim2.new(0.34, 0, 0, 20),
-		Position = UDim2.new(1, -58, 0.5, 0),
-		AnchorPoint = Vector2.new(1, 0.5),
+	local GlobalSearch = Create("Frame", Components, {
+		Size = UDim2.new(0, MainScroll.Size.X.Offset - 26, 0, 22),
+		Position = UDim2.new(0, 16, 0, TopBar.Size.Y.Offset + 4),
+		AnchorPoint = Vector2.new(0, 0),
 		BackgroundColor3 = Color3.fromRGB(0, 0, 0),
 		BackgroundTransparency = 0.35,
 		Name = "SearchBar"
-	}, {
-		Create("UISizeConstraint", {MinSize = Vector2.new(90, 0), MaxSize = Vector2.new(190, 100)})
 	})Make("Corner", GlobalSearch, UDim.new(0, 20))
+	-- acompanha a largura da coluna de abas ao redimensionar
+	MainScroll:GetPropertyChangedSignal("Size"):Connect(function()
+		GlobalSearch.Size = UDim2.new(0, MainScroll.Size.X.Offset - 26, 0, 22)
+	end)
 	Create("UIStroke", GlobalSearch, {
 		Color = Color3.fromRGB(255, 255, 255),
 		Thickness = 1,
