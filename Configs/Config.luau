@@ -8,7 +8,7 @@ return {
         [4756036428] = {
             Name = "Nzx",
             Tag = "Nzx",
-            Bio = "Hzs Hub Lider",
+            Bio = "Hzs Hub | Lider",
         },
     },
 
@@ -16,21 +16,21 @@ return {
         [11599459143] = {
             Name = "Mateus",
             Tag = "Mateus",
-            Bio = "Hzs Hub Sub Lider",
+            Bio = "Hzs Hub | Sub Lider",
         },
     },
     AdminWhitelist = {},
 
     AdminTag = {
-        Tag = "Hzs Admin",
-        Bio = "Hzs Hub Admin",
+        Tag = "Hzs Hub | Administrador",
+        Bio = "Hzs Hub | Administrador",
         Color = Color3.fromRGB(80, 170, 255),
     },
 
     FirebaseWhitelist = {
         Role = "Whitelist",
-        Tag = "Hzs Hub Owner",
-        Bio = "Hzs Hub Whitelister",
+        Tag = "Hzs Hub | Owner",
+        Bio = "Hzs Hub | Whitelister",
         Color = Color3.fromRGB(255, 105, 180),
     },
 
@@ -93,9 +93,9 @@ return {
         FirebaseOwnerColor = Color3.fromRGB(255, 105, 180),
         UserText = "Hzs Hub | User",
         UserColor = Color3.fromRGB(26, 196, 14),
-        OwnerText = "NZX OWNER Hzs",
+        OwnerText = "Nzx",
         OwnerColor = Color3.fromRGB(255, 40, 40),
-        SubOwnerText = "MATEUS SUBOWNER Hzs",
+        SubOwnerText = "Mateus",
         SubOwnerColor = Color3.fromRGB(255, 165, 0),
         AdminText = "Hzs ADMIN",
         AdminColor = Color3.fromRGB(80, 170, 255),
@@ -125,13 +125,13 @@ return {
         AutoDetect = true,
         Language = "",
         LanguageCode = "",
-        ExternalURL = "https://raw.githubusercontent.com/hzsScripts/HzsHub/refs/heads/main/Translations/Games/Brookhaven/Translation.json",
+        ExternalURL = "https://raw.githubusercontent.com/hzsScripts/HzsHub/refs/heads/main/Translations/Keys_EN.json",
         FallbackLanguage = "ENGLISH",
         LocaleMap = {},
         DynamicTranslation = true,
         DynamicMaxRequests = 6000,
         TranslateSingleWords = true,
-        DynamicRequestDelay = 0.05,
+        DynamicRequestDelay = 0.10,
         PreloadAllKeys = true,
     },
     Notify = {
