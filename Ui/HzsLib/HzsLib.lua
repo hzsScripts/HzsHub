@@ -20,13 +20,13 @@ local redzlib = {
 			}),
 			["Color Hub 2"] = Color3.fromRGB(12, 10, 12),
 			["Color Stroke"] = Color3.fromRGB(90, 45, 70),
-			["Color Theme"] = Color3.fromRGB(255, 105, 180),
+			["Color Theme"] = Color3.fromRGB(255, 105, 180), -- rosa (detalhes)
 			["Color Text"] = Color3.fromRGB(255, 255, 255),
 			["Color Dark Text"] = Color3.fromRGB(190, 170, 182)
 		}
 	},
 	Info = {
-		Version = "1.0.2"
+		Version = "1.1.0"
 	},
 	Background = {
 		Url = "https://cdn.discordapp.com/attachments/1552055729450520656/1571244099737100318/f7d253ec8f25453ac387322c3061e848.jpg?ex=6afc00d9&is=6afaaf59&hm=fdf771354caea0fd29440c4de49eab24d49fa9da79c14ec308916d54a8900e9d&",
@@ -1195,7 +1195,7 @@ end)
 AddEle("Stroke", function(parent, props, ...)
 	local args = {...}
 	local New = InsertTheme(SetProps(Create("UIStroke", parent, {
-		Color = args[1] or Theme["Color Stroke"],
+		Color = args[1] or Color3.fromRGB(255, 255, 255),
 		Thickness = args[2] or 1,
 		ApplyStrokeMode = "Border"
 	}), props), "Stroke")
@@ -1211,6 +1211,14 @@ AddEle("Button", function(parent, props, ...)
 		BackgroundTransparency = 0.25,
 		AutoButtonColor = false
 	}), props), "Frame")
+	
+	Create("UIStroke", New, {
+		Color = Color3.fromRGB(255, 255, 255),
+		Thickness = 1,
+		Transparency = 0.55,
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+		Name = "WhiteBorder"
+	})
 	
 	New.MouseEnter:Connect(function()
 		New.BackgroundTransparency = 0.5
@@ -1411,6 +1419,7 @@ function redzlib:MakeWindow(Configs)
 		Size = UDim2.fromOffset(UISizeX, UISizeY),
 		Position = UDim2.new(0.5, -UISizeX/2, 0.5, -UISizeY/2),
 		BackgroundTransparency = 0.03,
+		ClipsDescendants = true,
 		Name = "Hub"
 	}), "Main")
 	Make("Gradient", MainFrame, {
@@ -1419,14 +1428,14 @@ function redzlib:MakeWindow(Configs)
 	
 	local MainCorner = Make("Corner", MainFrame, UDim.new(0, 30))
 	
-	-- contorno rosa da janela (acompanha a cor do tema)
-	InsertTheme(Create("UIStroke", MainFrame, {
-		Color = Theme["Color Theme"],
+	-- contorno branco da janela
+	Create("UIStroke", MainFrame, {
+		Color = Color3.fromRGB(255, 255, 255),
 		Thickness = 1.5,
-		Transparency = 0.15,
+		Transparency = 0,
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 		Name = "WindowStroke"
-	}), "Theme")
+	})
 	
 	-- ===== Background por URL ===== --
 	local BgConfig = redzlib.Background
@@ -1588,10 +1597,10 @@ function redzlib:MakeWindow(Configs)
 		Name = "Tab Scroll"
 	}, {
 		Create("UIPadding", {
-			PaddingLeft = UDim.new(0, 10),
+			PaddingLeft = UDim.new(0, 16),
 			PaddingRight = UDim.new(0, 10),
 			PaddingTop = UDim.new(0, 10),
-			PaddingBottom = UDim.new(0, 10)
+			PaddingBottom = UDim.new(0, 24)
 		}), Create("UIListLayout", {
 			Padding = UDim.new(0, 5)
 		})
@@ -1923,9 +1932,9 @@ function redzlib:MakeWindow(Configs)
 		}, {
 			Create("UIPadding", {
 				PaddingLeft = UDim.new(0, 10),
-				PaddingRight = UDim.new(0, 10),
+				PaddingRight = UDim.new(0, 16),
 				PaddingTop = UDim.new(0, 10),
-				PaddingBottom = UDim.new(0, 10)
+				PaddingBottom = UDim.new(0, 24)
 			}), Create("UIListLayout", {
 				Padding = UDim.new(0, 5)
 			})
