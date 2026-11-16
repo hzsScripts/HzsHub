@@ -15,27 +15,28 @@ local redzlib = {
 		White = {
 			["Color Hub 1"] = ColorSequence.new({
 				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(0, 0, 0)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(14, 14, 14)),
+				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(16, 12, 15)),
 				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(0, 0, 0))
 			}),
-			["Color Hub 2"] = Color3.fromRGB(12, 12, 12),
-			["Color Stroke"] = Color3.fromRGB(70, 70, 70),
-			["Color Theme"] = Color3.fromRGB(255, 255, 255),
+			["Color Hub 2"] = Color3.fromRGB(12, 10, 12),
+			["Color Stroke"] = Color3.fromRGB(90, 45, 70),
+			["Color Theme"] = Color3.fromRGB(255, 105, 180),
 			["Color Text"] = Color3.fromRGB(255, 255, 255),
-			["Color Dark Text"] = Color3.fromRGB(170, 170, 170)
+			["Color Dark Text"] = Color3.fromRGB(190, 170, 182)
 		}
 	},
 	Info = {
-		Version = "1.0.0"
+		Version = "1.0.2"
 	},
 	Background = {
 		Url = "https://cdn.discordapp.com/attachments/1552055729450520656/1571244099737100318/f7d253ec8f25453ac387322c3061e848.jpg?ex=6afc00d9&is=6afaaf59&hm=fdf771354caea0fd29440c4de49eab24d49fa9da79c14ec308916d54a8900e9d&",
 		Dim = 0.45
 	},
 	Save = {
-		UISize = {550, 380},
-		TabSize = 160,
-		Theme = "White"
+		UISize = {550, 400},
+		TabSize = 150,
+		Theme = "White",
+		ScalePercent = 100
 	},
 	Settings = {},
 	Connection = {},
@@ -926,9 +927,9 @@ local SetProps, SetChildren, InsertTheme, Create do
 			local decode = HttpService:JSONDecode(readfile(file))
 			
 			if type(decode) == "table" then
-				if rawget(decode, "UISize") then redzlib.Save["UISize"] = decode["UISize"] end
-				if rawget(decode, "TabSize") then redzlib.Save["TabSize"] = decode["TabSize"] end
-				-- (tema salvo ignorado: o padrao agora e BlackWhite)
+				-- (tamanho salvo ignorado: vale o padrao do Save)
+				
+				-- (tema salvo ignorado: o padrao agora e White)
 			end
 		end
 	end
@@ -1186,7 +1187,7 @@ end
 
 AddEle("Corner", function(parent, CornerRadius)
 	local New = SetProps(Create("UICorner", parent, {
-		CornerRadius = CornerRadius or UDim.new(0, 12)
+		CornerRadius = CornerRadius or UDim.new(0, 20)
 	}), props)
 	return New
 end)
@@ -1265,7 +1266,7 @@ local function ButtonFrame(Instance, Title, Description, HolderSize)
 		Size = UDim2.new(1, 0, 0, 25),
 		AutomaticSize = "Y",
 		Name = "Option"
-	})Make("Corner", Frame, UDim.new(0, 10))
+	})Make("Corner", Frame, UDim.new(0, 20))
 	
 	LabelHolder = Create("Frame", Frame, {
 		AutomaticSize = "Y",
@@ -1416,7 +1417,16 @@ function redzlib:MakeWindow(Configs)
 		Rotation = 45
 	})MakeDrag(MainFrame)
 	
-	local MainCorner = Make("Corner", MainFrame, UDim.new(0, 16))
+	local MainCorner = Make("Corner", MainFrame, UDim.new(0, 30))
+	
+	-- contorno rosa da janela (acompanha a cor do tema)
+	InsertTheme(Create("UIStroke", MainFrame, {
+		Color = Theme["Color Theme"],
+		Thickness = 1.5,
+		Transparency = 0.15,
+		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+		Name = "WindowStroke"
+	}), "Theme")
 	
 	-- ===== Background por URL ===== --
 	local BgConfig = redzlib.Background
@@ -1430,7 +1440,7 @@ function redzlib:MakeWindow(Configs)
 		Image = "",
 		ZIndex = 0,
 		Visible = false
-	})Make("Corner", BackgroundImage, UDim.new(0, 16))
+	})Make("Corner", BackgroundImage, UDim.new(0, 30))
 	
 	local BackgroundDim = Create("Frame", MainFrame, {
 		Name = "BackgroundDim",
@@ -1440,33 +1450,74 @@ function redzlib:MakeWindow(Configs)
 		BorderSizePixel = 0,
 		ZIndex = 0,
 		Visible = false
-	})Make("Corner", BackgroundDim, UDim.new(0, 16))
+	})Make("Corner", BackgroundDim, UDim.new(0, 30))
+	
+	local function BgWarn(...) warn("[redz bg]", ...) end
+	
+	local function IsImage(Body)
+		if type(Body) ~= "string" or #Body < 200 then return false end
+		local b1, b2, b3, b4 = Body:byte(1, 4)
+		return (b1 == 0xFF and b2 == 0xD8)                         -- JPEG
+			or (b1 == 0x89 and b2 == 0x50 and b3 == 0x4E and b4 == 0x47) -- PNG
+			or (b1 == 0x47 and b2 == 0x49 and b3 == 0x46)             -- GIF
+			or (b1 == 0x52 and b2 == 0x49 and b3 == 0x46 and b4 == 0x46) -- WEBP
+	end
+	
+	local function Download(Url)
+		local Req = (syn and syn.request) or (http and http.request) or http_request or request
+		if Req then
+			local Ok, Res = pcall(Req, {
+				Url = Url,
+				Method = "GET",
+				Headers = {["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"}
+			})
+			if Ok and type(Res) == "table" then
+				if Res.StatusCode == 200 and IsImage(Res.Body) then return Res.Body end
+				BgWarn("download falhou, status:", Res.StatusCode, "(link expirado ou bloqueado?)")
+			else
+				BgWarn("request falhou:", tostring(Res))
+			end
+		end
+		local Ok, Res = pcall(function() return game:HttpGet(Url) end)
+		if Ok and IsImage(Res) then return Res end
+		return nil
+	end
 	
 	local function GetBackgroundAsset(Url)
 		local GetAsset = getcustomasset or getsynasset
-		if type(Url) ~= "string" or #Url == 0 or not (writefile and GetAsset) then return end
+		if type(Url) ~= "string" or #Url == 0 then return end
+		if not (writefile and GetAsset) then
+			BgWarn("seu executor nao tem writefile/getcustomasset")
+			return
+		end
 		
-		-- cache em disco (continua funcionando mesmo se o link do Discord expirar)
 		local Name = Url:match("/([%w_%-]+)%.%w+%?") or Url:match("/([%w_%-]+)%.%w+$") or "bg"
-		local File = "redz_bg_" .. Name .. ".img"
+		local File = "redz_bg_" .. Name .. ".jpg"
+		
+		-- cache invalido (ex: salvou uma pagina de erro) e apagado
+		if isfile and isfile(File) then
+			local Ok, Data = pcall(readfile, File)
+			if not (Ok and IsImage(Data)) then
+				pcall(delfile or function() end, File)
+			end
+		end
 		
 		if not (isfile and isfile(File)) then
-			local Body
-			local Req = (syn and syn.request) or (http and http.request) or http_request or request
-			if Req then
-				local Ok, Res = pcall(Req, {Url = Url, Method = "GET"})
-				if Ok and type(Res) == "table" and Res.StatusCode == 200 then Body = Res.Body end
+			local Body = Download(Url)
+			if not Body and Url:find("cdn.discordapp.com", 1, true) then
+				Body = Download((Url:gsub("cdn.discordapp.com", "media.discordapp.net")))
 			end
 			if not Body then
-				local Ok, Res = pcall(function() return game:HttpGet(Url) end)
-				if Ok then Body = Res end
+				BgWarn("nao consegui baixar a imagem. Gere um link novo ou use outro host (ex: imgur).")
+				return
 			end
-			if type(Body) ~= "string" or #Body < 200 then return end
 			writefile(File, Body)
+			task.wait(0.15)
 		end
 		
 		local Ok, Asset = pcall(GetAsset, File)
-		return Ok and Asset or nil
+		if not Ok then BgWarn("getcustomasset falhou:", tostring(Asset)) return end
+		return Asset
 	end
 	
 	task.spawn(function()
@@ -2118,7 +2169,7 @@ function redzlib:MakeWindow(Configs)
 				Position = UDim2.new(1, -10, 0.5),
 				AnchorPoint = Vector2.new(1, 0.5),
 				BackgroundColor3 = Theme["Color Stroke"]
-			}), "Stroke")Make("Corner", SelectedFrame, UDim.new(0, 8))
+			}), "Stroke")Make("Corner", SelectedFrame, UDim.new(0, 16))
 			
 			local ActiveLabel = InsertTheme(Create("TextLabel", SelectedFrame, {
 				Size = UDim2.new(0.85, 0, 0.85, 0),
@@ -2330,7 +2381,7 @@ function redzlib:MakeWindow(Configs)
 						Size = UDim2.new(1, 0, 0, 21),
 						Position = UDim2.new(0, 0, 0.5),
 						AnchorPoint = Vector2.new(0, 0.5)
-					})Make("Corner", Button, UDim.new(0, 8))
+					})Make("Corner", Button, UDim.new(0, 16))
 					
 					local IsSelected = InsertTheme(Create("Frame", Button, {
 						Position = UDim2.new(0, 1, 0.5),
@@ -2599,7 +2650,7 @@ function redzlib:MakeWindow(Configs)
 				Position = UDim2.new(1, -10, 0.5),
 				AnchorPoint = Vector2.new(1, 0.5),
 				BackgroundColor3 = Theme["Color Stroke"]
-			}), "Stroke")Make("Corner", SelectedFrame, UDim.new(0, 8))
+			}), "Stroke")Make("Corner", SelectedFrame, UDim.new(0, 16))
 			
 			local TextBoxInput = InsertTheme(Create("TextBox", SelectedFrame, {
 				Size = UDim2.new(0.85, 0, 0.85, 0),
@@ -2681,7 +2732,7 @@ function redzlib:MakeWindow(Configs)
 				Position = UDim2.new(0, 7, 0, 7),
 				Image = Logo,
 				BackgroundTransparency = 1
-			})Make("Corner", ImageLabel, UDim.new(0, 8))Make("Stroke", ImageLabel)
+			})Make("Corner", ImageLabel, UDim.new(0, 15))Make("Stroke", ImageLabel)
 			
 			local LTitle = InsertTheme(Create("TextLabel", FrameHolder, {
 				Size = UDim2.new(1, -52, 0, 15),
@@ -2716,7 +2767,7 @@ function redzlib:MakeWindow(Configs)
 				TextSize = 12,
 				TextColor3 = Color3.fromRGB(220, 220, 220),
 				BackgroundColor3 = Color3.fromRGB(50, 150, 50)
-			})Make("Corner", JoinButton, UDim.new(0, 10))
+			})Make("Corner", JoinButton, UDim.new(0, 20))
 			
 			local ClickDelay
 			JoinButton.Activated:Connect(function()
