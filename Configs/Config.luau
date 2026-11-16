@@ -7,22 +7,22 @@ return {
     Owner = {
         [4756036428] = {
             Name = "Nzx",
-            Tag = "NZX OWNER Hzs",
-            Bio = "Hzs Hub Owner",
+            Tag = "Nzx",
+            Bio = "Hzs Hub Lider",
         },
     },
 
     SubOwner = {
         [11599459143] = {
             Name = "Mateus",
-            Tag = "MATEUS SUBOWNER Hzs",
-            Bio = "Hzs Hub Subowner",
+            Tag = "Mateus",
+            Bio = "Hzs Hub Sub Lider",
         },
     },
     AdminWhitelist = {},
 
     AdminTag = {
-        Tag = "Hzs ADMIN",
+        Tag = "Hzs Admin",
         Bio = "Hzs Hub Admin",
         Color = Color3.fromRGB(80, 170, 255),
     },
