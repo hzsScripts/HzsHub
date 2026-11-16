@@ -29,7 +29,9 @@ local redzlib = {
 		Version = "1.1.0"
 	},
 	Background = {
+		-- URL da imagem de fundo (pode trocar aqui ou passar Background = "url" no MakeWindow)
 		Url = "https://cdn.discordapp.com/attachments/1552055729450520656/1571244099737100318/f7d253ec8f25453ac387322c3061e848.jpg?ex=6afc00d9&is=6afaaf59&hm=fdf771354caea0fd29440c4de49eab24d49fa9da79c14ec308916d54a8900e9d&",
+		-- 0 = imagem pura, 1 = so a camada escura (ajuda a ler os textos)
 		Dim = 0.45
 	},
 	Save = {
@@ -1583,9 +1585,9 @@ function redzlib:MakeWindow(Configs)
 	}), "Text")
 	
 	local MainScroll = InsertTheme(Create("ScrollingFrame", Components, {
-		Size = UDim2.new(0, redzlib.Save.TabSize, 1, -TopBar.Size.Y.Offset),
+		Size = UDim2.new(0, redzlib.Save.TabSize, 1, -TopBar.Size.Y.Offset - 14),
 		ScrollBarImageColor3 = Theme["Color Theme"],
-		Position = UDim2.new(0, 0, 1, 0),
+		Position = UDim2.new(0, 0, 1, -14),
 		AnchorPoint = Vector2.new(0, 1),
 		ScrollBarThickness = 1.5,
 		BackgroundTransparency = 1,
@@ -1600,16 +1602,16 @@ function redzlib:MakeWindow(Configs)
 			PaddingLeft = UDim.new(0, 16),
 			PaddingRight = UDim.new(0, 10),
 			PaddingTop = UDim.new(0, 10),
-			PaddingBottom = UDim.new(0, 24)
+			PaddingBottom = UDim.new(0, 8)
 		}), Create("UIListLayout", {
 			Padding = UDim.new(0, 5)
 		})
 	}), "ScrollBar")
 	
 	local Containers = Create("Frame", Components, {
-		Size = UDim2.new(1, -MainScroll.Size.X.Offset, 1, -TopBar.Size.Y.Offset),
+		Size = UDim2.new(1, -MainScroll.Size.X.Offset, 1, -TopBar.Size.Y.Offset - 14),
 		AnchorPoint = Vector2.new(1, 1),
-		Position = UDim2.new(1, 0, 1, 0),
+		Position = UDim2.new(1, 0, 1, -14),
 		BackgroundTransparency = 1,
 		ClipsDescendants = true,
 		Name = "Containers"
@@ -1636,8 +1638,8 @@ function redzlib:MakeWindow(Configs)
 		ControlSize1.Position = UDim2.fromOffset(math.clamp(Pos1.X.Offset, 430, 1000), math.clamp(Pos1.Y.Offset, 200, 500))
 		ControlSize2.Position = UDim2.new(0, math.clamp(Pos2.X.Offset, 135, 250), 1, 0)
 		
-		MainScroll.Size = UDim2.new(0, ControlSize2.Position.X.Offset, 1, -TopBar.Size.Y.Offset)
-		Containers.Size = UDim2.new(1, -MainScroll.Size.X.Offset, 1, -TopBar.Size.Y.Offset)
+		MainScroll.Size = UDim2.new(0, ControlSize2.Position.X.Offset, 1, -TopBar.Size.Y.Offset - 14)
+		Containers.Size = UDim2.new(1, -MainScroll.Size.X.Offset, 1, -TopBar.Size.Y.Offset - 14)
 		MainFrame.Size = ControlSize1.Position
 	end
 	
@@ -1934,7 +1936,7 @@ function redzlib:MakeWindow(Configs)
 				PaddingLeft = UDim.new(0, 10),
 				PaddingRight = UDim.new(0, 16),
 				PaddingTop = UDim.new(0, 10),
-				PaddingBottom = UDim.new(0, 24)
+				PaddingBottom = UDim.new(0, 8)
 			}), Create("UIListLayout", {
 				Padding = UDim.new(0, 5)
 			})
