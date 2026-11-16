@@ -1604,7 +1604,7 @@ function redzlib:MakeWindow(Configs)
 			PaddingTop = UDim.new(0, 10),
 			PaddingBottom = UDim.new(0, 8)
 		}), Create("UIListLayout", {
-			Padding = UDim.new(0, 5)
+			Padding = UDim.new(0, 3)
 		})
 	}), "ScrollBar")
 	
@@ -1885,7 +1885,7 @@ function redzlib:MakeWindow(Configs)
 		end
 		
 		local TabSelect = Make("Button", MainScroll, {
-			Size = UDim2.new(1, 0, 0, 24)
+			Size = UDim2.new(1, 0, 0, 20)
 		})Make("Corner", TabSelect)
 		
 		local LabelTitle = InsertTheme(Create("TextLabel", TabSelect, {
