@@ -7,7 +7,7 @@ return {
     },
     AdminWhitelist = {},
     AdminTag = {
-        Tag = game.Players.LocalPlayer.Name,
+        Tag = (game.Players.LocalPlayer and game.Players.LocalPlayer.Name) or "%s",
         Bio = "Hzs Hub | Administrador",
         Color = Color3.fromRGB(80, 170, 255),
     },
