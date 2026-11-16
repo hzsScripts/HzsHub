@@ -7,30 +7,30 @@ return {
     Owner = {
         [4756036428] = {
             Name = "Nzx",
-            Tag = "Nzx",
-            Bio = "Hzs Hub | Lider",
+            Tag = "Nzx | Hzs Hub Owner",
+            Bio = "Hzs Hub Owner",
         },
     },
 
     SubOwner = {
         [11599459143] = {
             Name = "Mateus",
-            Tag = "Mateus",
-            Bio = "Hzs Hub Sub Lider",
+            Tag = "Mateus | Hzs Hub SubOwner",
+            Bio = "Hzs Hub SubOwner",
         },
     },
     AdminWhitelist = {},
 
     AdminTag = {
-        Tag = "Hzs | Administrador",
+        Tag = "Hzs Hub | Admin",
         Bio = "Hzs Hub Admin",
         Color = Color3.fromRGB(80, 170, 255),
     },
 
     FirebaseWhitelist = {
         Role = "Whitelist",
-        Tag = "Hzs Hub Owner",
-        Bio = "Hzs Hub Whitelister",
+        Tag = "Hzs Hub | Whitelist",
+        Bio = "Hzs Hub Whitelist",
         Color = Color3.fromRGB(255, 105, 180),
     },
 
@@ -84,7 +84,7 @@ return {
     },
     UserBio = {
         Enabled = true,
-        Text = "Hzs Hub On Top",
+        Text = "Hzs Hub User",
         Color = Color3.fromRGB(26, 196, 14),
     },
     BillboardTag = {
@@ -93,9 +93,9 @@ return {
         FirebaseOwnerColor = Color3.fromRGB(255, 105, 180),
         UserText = "Hzs Hub | User",
         UserColor = Color3.fromRGB(26, 196, 14),
-        OwnerText = "Nzx",
+        OwnerText = "Nzx | Hzs Hub Owner",
         OwnerColor = Color3.fromRGB(255, 40, 40),
-        SubOwnerText = "Mateus",
+        SubOwnerText = "Mateus | Hzs Hub SubOwner",
         SubOwnerColor = Color3.fromRGB(255, 165, 0),
         AdminText = "Hzs Hub | Admin",
         AdminColor = Color3.fromRGB(80, 170, 255),
@@ -129,9 +129,9 @@ return {
         FallbackLanguage = "ENGLISH",
         LocaleMap = {},
         DynamicTranslation = true,
-        DynamicMaxRequests = 2200,
+        DynamicMaxRequests = 6000,
         TranslateSingleWords = true,
-        DynamicRequestDelay = 0.08,
+        DynamicRequestDelay = 0.06,
     },
     Notify = {
         Enabled = true,
