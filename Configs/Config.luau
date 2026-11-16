@@ -125,7 +125,7 @@ return {
         AutoDetect = true,
         Language = "",
         LanguageCode = "",
-        ExternalURL = "https://raw.githubusercontent.com/hzsScripts/HzsHub/refs/heads/main/Translations/Keys_EN.json",
+        ExternalURL = "https://raw.githubusercontent.com/hzsScripts/HzsHub/refs/heads/main/Translations/Games/Brookhaven/Keys.json",
         FallbackLanguage = "ENGLISH",
         LocaleMap = {},
         DynamicTranslation = true,
