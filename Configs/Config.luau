@@ -7,23 +7,23 @@ return {
     Owner = {
         [4756036428] = {
             Name = "Nzx",
-            Tag = "NZX OWNER Hzs",
-            Bio = "Hzs Hub Owner",
+            Tag = "Nzx",
+            Bio = "Hzs Hub | Lider",
         },
     },
 
     SubOwner = {
         [11599459143] = {
             Name = "Mateus",
-            Tag = "MATEUS SUBOWNER Hzs",
-            Bio = "Hzs Hub Subowner",
+            Tag = "Mateus",
+            Bio = "Hzs Hub Sub Lider",
         },
     },
 
     AdminWhitelist = {},
 
     AdminTag = {
-        Tag = "Hzs ADMIN",
+        Tag = "Hzs | Administrador",
         Bio = "Hzs Hub Admin",
         Color = Color3.fromRGB(80, 170, 255),
     },
@@ -31,7 +31,7 @@ return {
     FirebaseWhitelist = {
         Role = "Whitelist",
         Tag = "Hzs Hub Owner",
-        Bio = "Hzs Hub Whitelist",
+        Bio = "Hzs Hub Whitelister",
     },
 
     RemoteTagName = "1RPNam1eTex1t",
@@ -91,7 +91,7 @@ return {
 
     UserTag = {
         Enabled = true,
-        Text = "Hzs Hub User",
+        Text = "Hzs Hub | User",
         Color = Color3.fromRGB(26, 196, 14),
     },
 
@@ -103,13 +103,13 @@ return {
 
     BillboardTag = {
         Enabled = true,
-        FirebaseOwnerText = "Hzs Hub Owner",
+        FirebaseOwnerText = "Hzs Hub | Owner",
         FirebaseOwnerColor = Color3.fromRGB(255, 105, 180),
-        UserText = "Hzs Hub User",
+        UserText = "Hzs Hub | User",
         UserColor = Color3.fromRGB(26, 196, 14),
         OwnerColor = Color3.fromRGB(255, 40, 40),
         SubOwnerColor = Color3.fromRGB(255, 165, 0),
-        AdminText = "Hzs Hub Admin",
+        AdminText = "Hzs Hub | Admin",
         AdminColor = Color3.fromRGB(80, 170, 255),
         CountSuffix = " | Players Using Hzs Hub",
         CountColor = Color3.fromRGB(50, 255, 50),
