@@ -69,6 +69,7 @@ return {
         Enabled = true,
         Text = "VOCÊ NÃO PODE MUDAR A TAG!",
     },
+AntiBioChange = { Enabled = true, Text = "VOCÊ NÃO PODE ALTERAR A BIO!" },
 
     AntiConfigChange = {
         Enabled = true,
