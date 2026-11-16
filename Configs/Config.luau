@@ -1,33 +1,81 @@
+
 return {
+    -- OWNERS
     Owner = {
-        [4756036428] = { Name = "Nzx", Tag = "♡☆ | NZX | OWNER HZS | ☆♡", Bio = "Hzs Hub | ♡☆ Feito Por Mim ☆♡" },
+        [4756036428] = {
+            Name = "Nzx",
+            Tag = "NZX | OWNER",
+            Bio = "Hzs Script | Feito Por Mim"
+        },
     },
+
     SubOwner = {
-        [11599459143] = { Name = "Mateus", Tag = "☆ | MATEUS | SUB OWNER HZS | ☆", Bio = "☆ Hzs Hub | On Top ☆" },
+        [11599459143] = {
+            Name = "Mateus",
+            Tag = "MATEUS | SUB OWNER",
+            Bio = "Hzs Scripts | On Top"
+        },
     },
+
     FirebaseWhitelist = {
         Role = "Whitelist",
         Tag = "Hzs Hub | Owner",
-        Bio = "☆ Hzs Hub | Whitelist ☆",
+        Bio = "Hzs Hub | Whitelist",
     },
 
+    -- REMOTE DO JOGO
     RemoteTagName = "1RPNam1eTex1t",
     RemoteFolderName = "RE",
     TagFieldName = "RolePlayName",
     BioFieldName = "RolePlayBio",
-    Bio = { Enabled = true },
+    Bio = {
+        Enabled = true,
+    },
 
-    WhitelistConfig = { ["Everyone Can Use?"] = "false" },
-    NotificationConfig = { Duration = 7 },
+    -- WHITELIST
+    WhitelistConfig = {
+        ["Everyone Can Use?"] = "false",
+    },
 
+    -- NOTIFICAÇÕES
+    NotificationConfig = {
+        Duration = 7,
+    },
+
+    Notify = {
+        Enabled = true,
+        ImageID = "rbxassetid://127843403295538",
+        Title = "Acesso Liberado",
+        Text = "Bem-vindo, %s!",
+        TitleColor = Color3.fromRGB(255, 255, 255),
+        StrokeColor = Color3.fromRGB(255, 255, 255),
+        BackgroundColor = Color3.fromRGB(15, 15, 15),
+        IconHolderColor = Color3.fromRGB(35, 35, 35),
+        TextColor = Color3.fromRGB(200, 200, 200),
+        Width = 250,
+        Height = 78,
+        SlideInTime = 0.5,
+        SlideOutTime = 0.5,
+        DelayBeforeShow = 1,
+        DisplayOrder = 999,
+        BottomMargin = 15,
+        RightMargin = 15,
+        TitleTextSize = 13,
+        BodyTextSize = 11,
+    },
+
+    -- PROTEÇÕES
     AntiTagChange = {
         Enabled = true,
-        Text = "VOCÊ NÃO PODE MUDAR A TAG\nSe mudar, será punido!",
+        Text = "VOCÊ NÃO PODE MUDAR A TAG!",
     },
+
     AntiConfigChange = {
         Enabled = true,
-        Text = "VOCÊ NÃO PODE ALTERAR A CONFIG\nSe mudar, será punido!",
+        Text = "VOCÊ NÃO PODE ALTERAR A CONFIG!",
     },
+
+    -- KICK
     KickConfig = {
         KickMessage = "Acesso Negado\n\nVocê não está na whitelist deste Script.\nSolicite acesso ao administrador.",
         Delay = 5,
@@ -37,20 +85,36 @@ return {
         EnableLeaderKick = true,
     },
 
-    Load = { WaitForGame = true, WaitForCharacter = true, RemoteTimeout = 60 },
-    RGB = { Enabled = true, Speed = 8, Saturation = 1, Value = 1, RainbowObject = true },
+    -- CARREGAMENTO
+    Load = {
+        WaitForGame = true,
+        WaitForCharacter = true,
+        RemoteTimeout = 60,
+    },
 
+    -- RGB
+    RGB = {
+        Enabled = true,
+        Speed = 7,
+        Saturation = 1,
+        Value = 1,
+        RainbowObject = true,
+    },
+
+    -- TAG E BIO DOS USUÁRIOS
     UserTag = {
         Enabled = true,
-        Text = "~ | Hzs Hub | User | ♤",
-        Color = Color3.fromRGB(26, 196, 14),
-    },
-    UserBio = {
-        Enabled = true,
-        Text = "~ | Hzs Hub | On Top | ♤",
+        Text = "~ Hzs Hub | User",
         Color = Color3.fromRGB(26, 196, 14),
     },
 
+    UserBio = {
+        Enabled = true,
+        Text = "~ Hzs Hub | On Top",
+        Color = Color3.fromRGB(26, 196, 14),
+    },
+
+    -- BILLBOARD
     BillboardTag = {
         Enabled = true,
         FirebaseOwnerText = "Hzs Hub | Owner",
@@ -64,6 +128,8 @@ return {
         Size = UDim2.new(0, 240, 0, 50),
         StudsOffset = Vector3.new(0, 2.8, 0),
     },
+
+    -- AVISOS DE PROTEÇÃO
     Warning = {
         Duration = 10,
         Cooldown = 0.1,
@@ -77,27 +143,5 @@ return {
         TextSize = 16,
         SoundId = "rbxassetid://111198694307041",
         SoundVolume = 1,
-    },
-
-    ConfigUrl = "",
-    ConfigEnabled = false,
-    ConfigFetchInterval = 15,
-    ConfigPriority = "URL",
-
-    Notify = {
-        Enabled = true,
-        ImageID = "rbxassetid://136141469398409",
-        Title = "Acesso Liberado",
-        Text = "Bem-vindo, %s!",
-        TitleColor = Color3.fromRGB(255, 255, 255),
-        StrokeColor = Color3.fromRGB(255, 255, 255),
-        BackgroundColor = Color3.fromRGB(15, 15, 15),
-        IconHolderColor = Color3.fromRGB(35, 35, 35),
-        TextColor = Color3.fromRGB(200, 200, 200),
-        Width = 250, Height = 78,
-        SlideInTime = 0.5, SlideOutTime = 0.5,
-        DelayBeforeShow = 1, DisplayOrder = 999,
-        BottomMargin = 15, RightMargin = 15,
-        TitleTextSize = 13, BodyTextSize = 11,
     },
 }
