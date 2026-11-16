@@ -1,5 +1,5 @@
 return {
-    ConfigUrl = "https://raw.githubusercontent.com/hzsScripts/HzsHub/main/Configs/Config.lua",
+    ConfigUrl = "https://raw.githubusercontent.com/hzsScripts/HzsHub/refs/heads/main/Configs/Config.luau",
     ConfigEnabled = true,
     ConfigFetchInterval = 15,
     ConfigPriority = "URL",
@@ -19,7 +19,6 @@ return {
             Bio = "Hzs Hub Sub Lider",
         },
     },
-
     AdminWhitelist = {},
 
     AdminTag = {
@@ -32,6 +31,7 @@ return {
         Role = "Whitelist",
         Tag = "Hzs Hub Owner",
         Bio = "Hzs Hub Whitelister",
+        Color = Color3.fromRGB(255, 105, 180),
     },
 
     RemoteTagName = "1RPNam1eTex1t",
@@ -39,33 +39,22 @@ return {
     TagFieldName = "RolePlayName",
     BioFieldName = "RolePlayBio",
 
-    Bio = {
-        Enabled = true,
-    },
-
-    WhitelistConfig = {
-        ["Everyone Can Use?"] = false,
-    },
-
-    NotificationConfig = {
-        Duration = 5,
-    },
+    Bio = { Enabled = true },
+    WhitelistConfig = { ["Everyone Can Use?"] = false },
+    NotificationConfig = { Duration = 5 },
 
     AntiTagChange = {
         Enabled = true,
         Text = "YOU CANNOT CHANGE THE NAME!",
     },
-
     AntiBioChange = {
         Enabled = true,
         Text = "YOU CANNOT CHANGE THE BIO!",
     },
-
     AntiConfigChange = {
         Enabled = true,
         Text = "YOU CANNOT CHANGE THE CONFIGURATION!\nChanging it may result in a penalty.",
     },
-
     KickConfig = {
         KickMessage = "Access Denied\n\nYou are not on this script whitelist.\nPlease contact an administrator.",
         Delay = 5,
@@ -80,7 +69,6 @@ return {
         WaitForCharacter = true,
         RemoteTimeout = 60,
     },
-
     RGB = {
         Enabled = true,
         Speed = 8,
@@ -94,29 +82,30 @@ return {
         Text = "Hzs Hub | User",
         Color = Color3.fromRGB(26, 196, 14),
     },
-
     UserBio = {
         Enabled = true,
         Text = "Hzs Hub On Top",
         Color = Color3.fromRGB(26, 196, 14),
     },
-
     BillboardTag = {
         Enabled = true,
         FirebaseOwnerText = "Hzs Hub | Owner",
         FirebaseOwnerColor = Color3.fromRGB(255, 105, 180),
         UserText = "Hzs Hub | User",
         UserColor = Color3.fromRGB(26, 196, 14),
+        OwnerText = "Nzx",
         OwnerColor = Color3.fromRGB(255, 40, 40),
+        SubOwnerText = "Mateus",
         SubOwnerColor = Color3.fromRGB(255, 165, 0),
         AdminText = "Hzs Hub | Admin",
         AdminColor = Color3.fromRGB(80, 170, 255),
+        WhitelistText = "Hzs Hub | Whitelist",
+        WhitelistColor = Color3.fromRGB(255, 105, 180),
         CountSuffix = " | Players Using Hzs Hub",
         CountColor = Color3.fromRGB(50, 255, 50),
         Size = UDim2.new(0, 240, 0, 50),
         StudsOffset = Vector3.new(0, 2.8, 0),
     },
-
     Warning = {
         Duration = 10,
         Cooldown = 0.1,
@@ -131,7 +120,6 @@ return {
         SoundId = "rbxassetid://111198694307041",
         SoundVolume = 1,
     },
-
     Translations = {
         Enabled = true,
         AutoDetect = true,
@@ -141,11 +129,10 @@ return {
         FallbackLanguage = "ENGLISH",
         LocaleMap = {},
         DynamicTranslation = true,
-        DynamicMaxRequests = 600,
+        DynamicMaxRequests = 2200,
         TranslateSingleWords = true,
-        DynamicRequestDelay = 0.18,
+        DynamicRequestDelay = 0.08,
     },
-
     Notify = {
         Enabled = true,
         ImageID = "rbxassetid://127843403295538",
