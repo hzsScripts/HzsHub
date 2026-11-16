@@ -3,7 +3,7 @@
   "keyCount": 524,
   "source": "HzsHub_fixed_v6.lua complete static UI catalog + runtime component registration; v6 catalog preserved",
   "ENGLISH": {
-    "+   PLAY WITH AUDIO ID": "+   Play with Audio ID",
+    "PLAY WITH AUDIO ID": "Play with Audio ID",
     "350+ IDIOMAS": "350+ idiomas",
     "9:41                                      ●●●": "9:41                                      ●●●",
     "ABA": "Aba",
