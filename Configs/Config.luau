@@ -1,64 +1,76 @@
 return {
     Owner = {
-        [4756036428] = {
-            Name = "Nzx",
-            Tag = "Nzx Owner",
-            Bio = "Hzs Hub Owner"
-        },
+        [4756036428] = { Name = "Nzx", Tag = "Nzx Owner", Bio = "Hzs Hub Owner" },
     },
-
     SubOwner = {
-        [11599459143] = {
-            Name = "Mateus",
-            Tag = "Mateus Sub Owner",
-            Bio = "Hzs Hub Sub Owner"
-        },
+        [11599459143] = { Name = "Mateus", Tag = "Mateus Sub Owner", Bio = "Hzs Hub Sub Owner" },
     },
-
     AdminWhitelist = {},
-
-    AdminTag = {
-        Tag = "Hzs Admin",
-        Bio = "Hzs Hub Admin | Best Hub"
-    },
-
-    Bio = {
-        Enabled = true
-    },
-
-    AntiTagChange = {
-        Enabled = true,
-        Text = "YOU CANNOT CHANGE THE NAME!"
-    },
-
-    AntiBioChange = {
-        Enabled = true,
-        Text = "YOU CANNOT CHANGE THE BIO!"
-    },
-
+    AdminTag = { Tag = "Hzs Admin", Bio = "Hzs Hub Admin | Best Hub" },
+    Bio = { Enabled = true },
+    AntiTagChange = { Enabled = true, Text = "YOU CANNOT CHANGE THE NAME!" },
+    AntiBioChange = { Enabled = true, Text = "YOU CANNOT CHANGE THE BIO!" },
     BillboardTag = {
         Enabled = true,
         FirebaseOwnerText = "Hzs Hub Owner",
+        FirebaseOwnerColor = Color3.fromRGB(255, 105, 180),
         UserText = "Hzs Hub User",
+        UserColor = Color3.fromRGB(26, 196, 14),
+        OwnerColor = Color3.fromRGB(255, 40, 40),
+        SubOwnerColor = Color3.fromRGB(255, 165, 0),
         AdminText = "Hzs Hub Admin",
+        AdminColor = Color3.fromRGB(80, 170, 255),
+        CountSuffix = " | Players Using Hzs Hub",
+        CountColor = Color3.fromRGB(50, 255, 50),
+        Size = UDim2.new(0, 240, 0, 50),
+        StudsOffset = Vector3.new(0, 2.8, 0),
     },
-
-    NotificationConfig = {
-        Duration = 5
+    NotificationConfig = { Duration = 5 },
+    RGB = { Enabled = true, Speed = 8, Saturation = 1, Value = 1, RainbowObject = true },
+    WhitelistConfig = { ["Everyone Can Use?"] = false },
+    KickConfig = {
+        KickMessage = "Access Denied\n\nYou are not on this script whitelist.\nPlease contact an administrator.",
+        Delay = 5,
+        DefaultReason = "You were removed from the server by a Hzs Hub moderator.",
+        CheckInterval = 1,
+        MaxAge = 300,
+        EnableLeaderKick = true,
     },
-
-    RGB = {
-        Enabled = true,
-        Speed = 5
-    },
-
     Translations = {
         Enabled = false,
         AutoDetect = true,
         ExternalURL = "",
         FallbackLanguage = "ENGLISH",
     },
-
+    Load = { WaitForGame = true, WaitForCharacter = true, RemoteTimeout = 60 },
+    Warning = {
+        Duration = 10,
+        Cooldown = 0.1,
+        Color = Color3.fromRGB(255, 255, 255),
+        Background = Color3.fromRGB(0, 0, 0),
+        OverlayTransparency = 0,
+        BoxColor = Color3.fromRGB(0, 0, 0),
+        TextColor = Color3.fromRGB(255, 255, 255),
+        Width = 380, Height = 130, TextSize = 16,
+        SoundId = "rbxassetid://111198694307041",
+        SoundVolume = 1,
+    },
+    Notify = {
+        Enabled = true,
+        ImageID = "rbxassetid://127843403295538",
+        Title = "Access Granted",
+        Text = "Welcome, %s!",
+        TitleColor = Color3.fromRGB(255, 255, 255),
+        StrokeColor = Color3.fromRGB(255, 255, 255),
+        BackgroundColor = Color3.fromRGB(15, 15, 15),
+        IconHolderColor = Color3.fromRGB(35, 35, 35),
+        TextColor = Color3.fromRGB(200, 200, 200),
+        Width = 250, Height = 78,
+        SlideInTime = 0.5, SlideOutTime = 0.5,
+        DelayBeforeShow = 1, DisplayOrder = 999,
+        BottomMargin = 15, RightMargin = 15,
+        TitleTextSize = 13, BodyTextSize = 11,
+    },
     ConfigEnabled = true,
     ConfigFetchInterval = 15,
 }
