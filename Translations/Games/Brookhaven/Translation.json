@@ -1,7 +1,7 @@
 {
   "version": 1.0,
   "keyCount": 701,
-  "source": "HzsHub_fixed_v8.lua — chaves estáticas extraídas das abas, componentes Add*, opções, propriedades Text/Title/Description/Placeholder, notificações e helpers de interface. O objeto ENGLISH permite que o carregador remoto registre as chaves.",
+  "source": "Hzs Hub | Beta",
   "keys": [
     "PLAY WITH AUDIO ID",
     "/200",
