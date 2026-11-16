@@ -7,7 +7,7 @@ return {
     Owner = {
         [4756036428] = {
             Name = "Nzx",
-            Tag = "Nzx | Hzs Hub Owner",
+            Tag = "NZX OWNER Hzs",
             Bio = "Hzs Hub Owner",
         },
     },
@@ -15,22 +15,22 @@ return {
     SubOwner = {
         [11599459143] = {
             Name = "Mateus",
-            Tag = "Mateus | Hzs Hub SubOwner",
-            Bio = "Hzs Hub SubOwner",
+            Tag = "MATEUS SUBOWNER Hzs",
+            Bio = "Hzs Hub Subowner",
         },
     },
     AdminWhitelist = {},
 
     AdminTag = {
-        Tag = "Hzs Hub | Admin",
+        Tag = "Hzs ADMIN",
         Bio = "Hzs Hub Admin",
         Color = Color3.fromRGB(80, 170, 255),
     },
 
     FirebaseWhitelist = {
         Role = "Whitelist",
-        Tag = "Hzs Hub | Whitelist",
-        Bio = "Hzs Hub Whitelist",
+        Tag = "Hzs Hub Owner",
+        Bio = "Hzs Hub Whitelister",
         Color = Color3.fromRGB(255, 105, 180),
     },
 
@@ -84,22 +84,22 @@ return {
     },
     UserBio = {
         Enabled = true,
-        Text = "Hzs Hub User",
+        Text = "Hzs Hub On Top",
         Color = Color3.fromRGB(26, 196, 14),
     },
     BillboardTag = {
         Enabled = true,
-        FirebaseOwnerText = "Hzs Hub | Owner",
+        FirebaseOwnerText = "Hzs Hub Owner",
         FirebaseOwnerColor = Color3.fromRGB(255, 105, 180),
         UserText = "Hzs Hub | User",
         UserColor = Color3.fromRGB(26, 196, 14),
-        OwnerText = "Nzx | Hzs Hub Owner",
+        OwnerText = "NZX OWNER Hzs",
         OwnerColor = Color3.fromRGB(255, 40, 40),
-        SubOwnerText = "Mateus | Hzs Hub SubOwner",
+        SubOwnerText = "MATEUS SUBOWNER Hzs",
         SubOwnerColor = Color3.fromRGB(255, 165, 0),
-        AdminText = "Hzs Hub | Admin",
+        AdminText = "Hzs ADMIN",
         AdminColor = Color3.fromRGB(80, 170, 255),
-        WhitelistText = "Hzs Hub | Whitelist",
+        WhitelistText = "Hzs Hub Owner",
         WhitelistColor = Color3.fromRGB(255, 105, 180),
         CountSuffix = " | Players Using Hzs Hub",
         CountColor = Color3.fromRGB(50, 255, 50),
@@ -125,13 +125,14 @@ return {
         AutoDetect = true,
         Language = "",
         LanguageCode = "",
-        ExternalURL = "",
+        ExternalURL = "https://raw.githubusercontent.com/hzsScripts/HzsHub/refs/heads/main/Translations/Games/Brookhaven/Translation.json",
         FallbackLanguage = "ENGLISH",
         LocaleMap = {},
         DynamicTranslation = true,
         DynamicMaxRequests = 6000,
         TranslateSingleWords = true,
-        DynamicRequestDelay = 0.06,
+        DynamicRequestDelay = 0.05,
+        PreloadAllKeys = true,
     },
     Notify = {
         Enabled = true,
