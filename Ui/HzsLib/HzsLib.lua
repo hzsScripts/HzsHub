@@ -19059,7 +19059,7 @@ end
 
 function HzsLib:GetIcon(index, collection)
 	if type(index) ~= "string" or index:find("rbxassetid://") or #index == 0 then return index end
-	local requested = collection
+	local requested = type(collection) == "string" and collection ~= "" and collection or nil
 	local name = index
 	if not requested then
 		local parsedCollection, parsedName = index:match("^([%w_]+):(.*)$")
@@ -19086,6 +19086,7 @@ function HzsLib:GetIcon(index, collection)
 		return entry
 	end
 	local firstMatch = nil
+	if type(name) ~= "string" then name = index end
 	name = string.lower(name):gsub("lucide", ""):gsub("-", "")
 	if self.Icons[name] then return self.Icons[name] end
 	for iconName, icon in pairs(self.Icons) do
