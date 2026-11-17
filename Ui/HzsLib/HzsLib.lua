@@ -19455,19 +19455,34 @@ function HzsLib:MakeWindow(Configs)
 		Name = "Control Tab Size"
 	}))
 	
-	local function ControlSize()
-		local Pos1, Pos2 = ControlSize1.Position, ControlSize2.Position
-		ControlSize1.Position = UDim2.fromOffset(math.clamp(Pos1.X.Offset, 430, 1000), math.clamp(Pos1.Y.Offset, 200, 500))
-		ControlSize2.Position = UDim2.new(0, math.clamp(Pos2.X.Offset, 135, 250), 1, 0)
-		
-		MainScroll.Size = UDim2.new(0, ControlSize2.Position.X.Offset, 1, -TopBar.Size.Y.Offset - 82 - SearchH)
-			MainScroll.Position = UDim2.new(0, 0, 1, -72)
-		Containers.Size = UDim2.new(1, -MainScroll.Size.X.Offset, 1, -TopBar.Size.Y.Offset - 14)
-		MainFrame.Size = ControlSize1.Position
-	end
-	
-	ControlSize1:GetPropertyChangedSignal("Position"):Connect(ControlSize)
-	ControlSize2:GetPropertyChangedSignal("Position"):Connect(ControlSize)
+	local SizeUpdatePending = false
+local function ControlSize()
+if SizeUpdatePending then return end
+SizeUpdatePending = true
+task.defer(function()
+if not MainFrame.Parent then SizeUpdatePending = false return end
+local Pos1, Pos2 = ControlSize1.Position, ControlSize2.Position
+local Width = math.floor(math.clamp(Pos1.X.Offset, 430, 1000) + 0.5)
+local Height = math.floor(math.clamp(Pos1.Y.Offset, 200, 500) + 0.5)
+local TabWidth = math.floor(math.clamp(Pos2.X.Offset, 135, 250) + 0.5)
+if Pos1.X.Scale ~= 0 or Pos1.Y.Scale ~= 0 or Pos1.X.Offset ~= Width or Pos1.Y.Offset ~= Height then
+ControlSize1.Position = UDim2.fromOffset(Width, Height)
+end
+if Pos2.X.Scale ~= 0 or Pos2.Y.Scale ~= 1 or Pos2.X.Offset ~= TabWidth or Pos2.Y.Offset ~= 0 then
+ControlSize2.Position = UDim2.new(0, TabWidth, 1, 0)
+end
+MainScroll.Size = UDim2.new(0, TabWidth, 1, -TopBar.Size.Y.Offset - 82 - SearchH)
+MainScroll.Position = UDim2.new(0, 0, 1, -72)
+Containers.Size = UDim2.new(1, -TabWidth, 1, -TopBar.Size.Y.Offset - 14)
+if MainFrame.Size.X.Offset ~= Width or MainFrame.Size.Y.Offset ~= Height then
+MainFrame.Size = UDim2.fromOffset(Width, Height)
+end
+SizeUpdatePending = false
+end)
+end
+ControlSize1:GetPropertyChangedSignal("Position"):Connect(ControlSize)
+ControlSize2:GetPropertyChangedSignal("Position"):Connect(ControlSize)
+ControlSize()
 	
 	ConnectSave(ControlSize1, function()
 		if not Minimized then
@@ -19553,6 +19568,7 @@ function HzsLib:MakeWindow(Configs)
 		Handle.InputBegan:Connect(function(Input)
 			local T = Input.UserInputType
 			if T ~= Enum.UserInputType.MouseButton1 and T ~= Enum.UserInputType.Touch then return end
+			if Resizing or not EdgeHolder.Visible then return end
 			
 			local function Pointer()
 				if T == Enum.UserInputType.Touch then
@@ -19570,9 +19586,10 @@ function HzsLib:MakeWindow(Configs)
 			
 			while Input.UserInputState ~= Enum.UserInputState.End and EdgeHolder.Visible do
 				RunService.RenderStepped:Wait()
-				local d = (Pointer() - P0) / UIScale
-				local nW = DirX ~= 0 and math.clamp(W0 + DirX * d.X, 430, 1000) or W0
-				local nH = DirY ~= 0 and math.clamp(H0 + DirY * d.Y, 200, 500) or H0
+					local SafeScale = math.max(tonumber(UIScale) or 1, 0.01)
+				local d = (Pointer() - P0) / SafeScale
+				local nW = DirX ~= 0 and math.floor(math.clamp(W0 + DirX * d.X, 430, 1000) + 0.5) or W0
+				local nH = DirY ~= 0 and math.floor(math.clamp(H0 + DirY * d.Y, 200, 500) + 0.5) or H0
 				
 				if DirX < 0 or DirY < 0 then
 					MainFrame.Position = UDim2.new(
@@ -19641,12 +19658,14 @@ CloseButton:SetAttribute("Snd", "Close")
 			AccountOverlay:Destroy()
 			AccountOverlay = nil
 			AccountPanelOpen = false
+				if EdgeHolder then EdgeHolder.Visible = not Minimized end
 		end
 	end
 
 	local function OpenAccountPanel()
 		if AccountPanelOpen then CloseAccountPanel() return end
 		AccountPanelOpen = true
+			if EdgeHolder then EdgeHolder.Visible = false end
 
 		
 		AccountOverlay = Create("Frame", MainFrame, {
@@ -19663,21 +19682,27 @@ CloseButton:SetAttribute("Snd", "Close")
 
 		
 		local Panel = Create("Frame", AccountOverlay, {
-			Size = UDim2.new(0.72, 0, 0.9, 0),
+			Size = UDim2.new(0.94, 0, 0.98, 0),
 			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundColor3 = Theme["Color Hub 2"],
-			BackgroundTransparency = 0,
+			BackgroundTransparency = 1,
 			ZIndex = 51,
 			Name = "AccountPanel"
 		})
 		Make("Corner", Panel, UDim.new(0, 20))
-		Create("UIStroke", Panel, {
-			Color = Theme["Color Theme"],
-			Thickness = 1.5,
-			ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		})
-		Make("Gradient", Panel, {Rotation = 45})
+local ProfilePanelStroke = InsertTheme(Create("UIStroke", Panel, {
+Color = Theme["Color Text"], Thickness = 1.5,
+ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+}), "Text")
+local CompactProfile = MainFrame.Size.Y.Offset < 330
+local CompactScale = CompactProfile and math.clamp((MainFrame.Size.Y.Offset * 0.98) / 196, 1, 1.5) or 1
+local ProfileRowHeight = CompactProfile and 20 * CompactScale or 26
+local ProfileRowY1 = CompactProfile and 90 * CompactScale or 0.49
+local ProfileRowY2 = CompactProfile and 112 * CompactScale or 0.59
+local ProfileKeyY = CompactProfile and 134 * CompactScale or 0.69
+local ProfileActivateY = CompactProfile and 156 * CompactScale or 0.79
+local ProfileLogoutY = CompactProfile and 176 * CompactScale or 0.89
 
 		
 		
@@ -19688,18 +19713,18 @@ CloseButton:SetAttribute("Snd", "Close")
 				TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 52
 			})
 local PanelClose = Create("TextButton", Panel, {
-				Size = UDim2.fromOffset(52, 22), Position = UDim2.new(1, -10, 0, 8),
+				Size = UDim2.fromOffset(26, 26), Position = UDim2.new(1, -8, 0, 8),
 				AnchorPoint = Vector2.new(1, 0), BackgroundColor3 = Theme["Color Stroke"],
-				TextColor3 = Theme["Color Text"], Text = "Fechar", Font = Enum.Font.GothamMedium,
-				TextSize = 9, ZIndex = 52, AutoButtonColor = true
+				TextColor3 = Theme["Color Text"], Text = "X", Font = Enum.Font.GothamBold,
+				TextSize = 12, ZIndex = 52, AutoButtonColor = true
 			})
 			Make("Corner", PanelClose, UDim.new(0, 7))
 			PanelClose.Activated:Connect(CloseAccountPanel)
 
 		
 		local AvatarFrame = Create("Frame", Panel, {
-			Size = UDim2.fromOffset(56, 56),
-			Position = UDim2.new(0, 18, 0.1, 0),
+			Size = UDim2.fromOffset(CompactProfile and 42 * CompactScale or 56, CompactProfile and 42 * CompactScale or 56),
+			Position = CompactProfile and UDim2.fromOffset(18, 22 * CompactScale) or UDim2.new(0, 18, 0.1, 0),
 			AnchorPoint = Vector2.new(0, 0),
 			BackgroundTransparency = 1,
 			ZIndex = 52
@@ -19717,8 +19742,8 @@ local PanelClose = Create("TextButton", Panel, {
 		
 
 		local DisplayRow = Create("Frame", Panel, {
-			Size = UDim2.new(1, -100, 0, 22),
-			Position = UDim2.new(0, 86, 0.12, 0),
+			Size = CompactProfile and UDim2.new(1, -80 * CompactScale, 0, 20 * CompactScale) or UDim2.new(1, -100, 0, 22),
+			Position = CompactProfile and UDim2.fromOffset(70 * CompactScale, 24 * CompactScale) or UDim2.new(0, 86, 0.12, 0),
 			BackgroundTransparency = 1,
 			ZIndex = 52
 		})
@@ -19733,8 +19758,8 @@ local PanelClose = Create("TextButton", Panel, {
 			ZIndex = 52
 		})
 		local UsernameRow = Create("Frame", Panel, {
-			Size = UDim2.new(1, -100, 0, 20),
-			Position = UDim2.new(0, 86, 0.19, 0),
+			Size = CompactProfile and UDim2.new(1, -80 * CompactScale, 0, 18 * CompactScale) or UDim2.new(1, -100, 0, 20),
+			Position = CompactProfile and UDim2.fromOffset(70 * CompactScale, 39 * CompactScale) or UDim2.new(0, 86, 0.19, 0),
 			BackgroundTransparency = 1,
 			ZIndex = 52
 		})
@@ -19749,21 +19774,24 @@ local PanelClose = Create("TextButton", Panel, {
 			ZIndex = 52
 		})
 		local AccountTierLabel = Create("TextLabel", Panel, {
-			Size = UDim2.new(1, -20, 0, 15), Position = UDim2.new(0, 86, 0.26, 0),
+			Size = UDim2.new(1, -20, 0, CompactProfile and 14 * CompactScale or 15),
+			Position = CompactProfile and UDim2.fromOffset(70 * CompactScale, 52 * CompactScale) or UDim2.new(0, 86, 0.26, 0),
 			BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 9,
 			Text = ProfileData.Premium and "PREMIUM" or "BASIC",
 			TextColor3 = ProfileData.Premium and Color3.fromRGB(255, 205, 65) or Theme["Color Dark Text"],
 			TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 52
 		})
 			local ThemeDropdown = Create("TextButton", Panel, {
-				Size = UDim2.new(1, -24, 0, 30), Position = UDim2.new(0, 12, 0.34, 0),
+				Size = UDim2.new(1, -24, 0, CompactProfile and 22 * CompactScale or 30),
+				Position = CompactProfile and UDim2.new(0, 12, 0, 66 * CompactScale) or UDim2.new(0, 12, 0.34, 0),
 				BackgroundColor3 = Theme["Color Hub 2"], TextColor3 = Theme["Color Text"],
 				Font = Enum.Font.GothamMedium, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left,
 				Text = tostring(HzsLib.Save.Theme), AutoButtonColor = true, ZIndex = 54
 			})
 			Make("Corner", ThemeDropdown, UDim.new(0, 8))
 			local ThemeMenu = Create("ScrollingFrame", Panel, {
-				Size = UDim2.new(1, -24, 0.34, 0), Position = UDim2.new(0, 12, 0.42, 0),
+				Size = CompactProfile and UDim2.new(1, -24, 0, 44 * CompactScale) or UDim2.new(1, -24, 0.34, 0),
+				Position = CompactProfile and UDim2.new(0, 12, 0, 90 * CompactScale) or UDim2.new(0, 12, 0.42, 0),
 				BackgroundColor3 = Theme["Color Hub 2"], BorderSizePixel = 0, ScrollBarThickness = 3,
 				CanvasSize = UDim2.new(0, 0, 0, 0), AutomaticCanvasSize = Enum.AutomaticSize.Y,
 				Visible = false, ZIndex = 60
@@ -19846,8 +19874,12 @@ elseif object:IsA("ImageButton") then
 object.ImageColor3 = Theme["Color Theme"]
 elseif object:IsA("Frame") and object ~= Panel and object.BackgroundTransparency < 1 then
 object.BackgroundColor3 = Theme["Color Stroke"]
-elseif object:IsA("UIStroke") and object ~= ThemeDropdownStroke then
+elseif object:IsA("UIStroke") then
+if object == ProfilePanelStroke then
+object.Color = Theme["Color Text"]
+elseif object ~= ThemeDropdownStroke then
 object.Color = Theme["Color Stroke"]
+end
 end
 end
 for _, option in ipairs(ThemeChoices) do
@@ -19864,8 +19896,8 @@ ThemeDropdown.Activated:Connect(ToggleThemeMenu)
 
 local function MakeEditField(label, yPos, field)
 local row = Create("Frame", Panel, {
-Size = UDim2.new(1, -24, 0, 26),
-Position = UDim2.new(0, 12, yPos, 0),
+Size = UDim2.new(1, -24, 0, ProfileRowHeight),
+Position = CompactProfile and UDim2.new(0, 12, 0, yPos) or UDim2.new(0, 12, yPos, 0),
 BackgroundColor3 = Theme["Color Stroke"],
 BackgroundTransparency = 0.6,
 ZIndex = 52
@@ -19913,11 +19945,11 @@ end
 end)
 return row
 end
-MakeEditField("Nome:", 0.49, "DisplayName")
-MakeEditField("Usuário:", 0.59, "Username")
+MakeEditField("Nome:", ProfileRowY1, "DisplayName")
+MakeEditField("Usuário:", ProfileRowY2, "Username")
 
 local ProfileKeyRow = Create("Frame", Panel, {
-Size = UDim2.new(1, -24, 0, 26), Position = UDim2.new(0, 12, 0.69, 0),
+Size = UDim2.new(1, -24, 0, ProfileRowHeight), Position = CompactProfile and UDim2.new(0, 12, 0, ProfileKeyY) or UDim2.new(0, 12, 0.69, 0),
 BackgroundColor3 = Theme["Color Stroke"], BackgroundTransparency = 0.6, ZIndex = 52
 })
 Make("Corner", ProfileKeyRow, UDim.new(0, 9))
@@ -19930,23 +19962,46 @@ PlaceholderColor3 = Theme["Color Dark Text"], TextXAlignment = Enum.TextXAlignme
 ClearTextOnFocus = false, ZIndex = 53
 })
 ActivateKeyButton = Create("TextButton", Panel, {
-Size = UDim2.new(1, -24, 0, 25), Position = UDim2.new(0, 12, 0.79, 0),
+Size = UDim2.new(1, -24, 0, CompactProfile and 18 * CompactScale or 25), Position = CompactProfile and UDim2.new(0, 12, 0, ProfileActivateY) or UDim2.new(0, 12, 0.79, 0),
 BackgroundColor3 = ProfileData.Premium and Color3.fromRGB(45, 145, 90) or Theme["Color Theme"],
 Font = Enum.Font.GothamBold, TextSize = 10, TextColor3 = Color3.new(1, 1, 1),
 Text = ProfileData.Premium and "Premium ativo" or "Ativar key",
 AutoButtonColor = not ProfileData.Premium, ZIndex = 52
 })
 Make("Corner", ActivateKeyButton, UDim.new(0, 9))
+local KeyCheckBusy = false
 ActivateKeyButton.Activated:Connect(function()
-if ProfileData.Premium then return end
-local key = ProfileKeyBox.Text:gsub("%s", "")
+if ProfileData.Premium or KeyCheckBusy then return end
+local key = ProfileKeyBox.Text:match("^%s*(.-)%s*$") or ""
 local validator = HzsLib.PremiumKeyValidator
 if key == "" then ProfileKeyBox.PlaceholderText = "Digite uma key primeiro" return end
-if type(validator) ~= "function" then ProfileKeyBox.Text = "Validador externo não conectado" return end
+if #key < 6 or #key > 128 or key:find("%c") then
+ActivateKeyButton.Text = "Formato de key inválido"
+task.delay(1.5, function() if ActivateKeyButton.Parent and not ProfileData.Premium then ActivateKeyButton.Text = "Ativar key" end end)
+return
+end
+if type(validator) ~= "function" then
+ActivateKeyButton.Text = "Validador indisponível"
+task.delay(1.5, function() if ActivateKeyButton.Parent and not ProfileData.Premium then ActivateKeyButton.Text = "Ativar key" end end)
+return
+end
+KeyCheckBusy = true
+ActivateKeyButton.Text = "Verificando..."
+ActivateKeyButton.AutoButtonColor = false
 local ok, valid = pcall(validator, key, {
 Username = ProfileData.Username, DisplayName = ProfileData.DisplayName, UserId = Player.UserId
 })
-if not ok or valid ~= true then ProfileKeyBox.Text = "Key inválida" return end
+KeyCheckBusy = false
+if not ok or valid ~= true then
+ActivateKeyButton.Text = "Key inválida"
+task.delay(1.5, function()
+if ActivateKeyButton.Parent and not ProfileData.Premium then
+ActivateKeyButton.Text = "Ativar key"
+ActivateKeyButton.AutoButtonColor = true
+end
+end)
+return
+end
 ProfileData.Premium = true
 SaveProfile()
 AccountTierLabel.Text = "PREMIUM"
@@ -19962,8 +20017,8 @@ end)
 if ProfileData.Premium then ProfileKeyBox.TextEditable = false end
 
 local LogoutBtn = Create("TextButton", Panel, {
-Size = UDim2.new(1, -24, 0, 28),
-Position = UDim2.new(0, 12, 0.89, 0),
+Size = UDim2.new(1, -24, 0, CompactProfile and 18 * CompactScale or 28),
+Position = CompactProfile and UDim2.new(0, 12, 0, ProfileLogoutY) or UDim2.new(0, 12, 0.89, 0),
 BackgroundColor3 = Color3.fromRGB(122, 42, 55),
 BackgroundTransparency = 0.1,
 Font = Enum.Font.GothamBold,
@@ -19985,7 +20040,7 @@ Window:ShowLoginScreen()
 end)
 
 Panel.Size = UDim2.fromScale(0, 0)
-CreateTween({Panel, "Size", UDim2.new(0.72, 0, 0.9, 0), 0.25})
+CreateTween({Panel, "Size", UDim2.new(0.94, 0, 0.98, 0), 0.25})
 end
 
 ProfileCard = Create("TextButton", Components, {
