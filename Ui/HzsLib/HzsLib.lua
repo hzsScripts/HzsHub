@@ -19194,10 +19194,12 @@ function HzsLib:SetTheme(NewTheme)
 	table.foreach(HzsLib.Instances, function(_, Val)
 		local instance = Val.Instance
 		if not instance then return end
-		if Val.Type == "Gradient" then
+		if Val.Type == "Main" then
+			pcall(function() CreateTween({instance, "BackgroundColor3", Theme["Color Hub 2"], 0.22}) end)
+		elseif Val.Type == "Gradient" then
 			pcall(function() instance.Color = Theme["Color Hub 1"] end)
 		elseif Val.Type == "Frame" then
-			pcall(function() instance.BackgroundColor3 = Theme["Color Hub 2"] end)
+			pcall(function() CreateTween({instance, "BackgroundColor3", Theme["Color Hub 2"], 0.22}) end)
 		elseif Val.Type == "Stroke" or Val.Type == "Theme" or Val.Type == "Text" or Val.Type == "DarkText" or Val.Type == "ScrollBar" then
 			local property = GetColor(instance)
 			local paletteKey = "Color Text"
@@ -19208,7 +19210,7 @@ function HzsLib:SetTheme(NewTheme)
 			elseif Val.Type == "DarkText" then
 				paletteKey = "Color Dark Text"
 			end
-			if property then pcall(function() instance[property] = Theme[paletteKey] end) end
+			if property and Theme[paletteKey] then pcall(function() CreateTween({instance, property, Theme[paletteKey], 0.22}) end) end
 		end
 	end)
 end
@@ -19264,13 +19266,13 @@ function HzsLib:MakeWindow(Configs)
 	local MainCorner = Make("Corner", MainFrame, UDim.new(0, 30))
 	
 	
-	Create("UIStroke", MainFrame, {
+	InsertTheme(Create("UIStroke", MainFrame, {
 		Color = Theme["Color Stroke"],
 		Thickness = 1.5,
 		Transparency = 0,
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
 		Name = "WindowStroke"
-	})
+	}), "Stroke")
 	
 	
 	local BgConfig = HzsLib.Background
@@ -19661,7 +19663,7 @@ CloseButton:SetAttribute("Snd", "Close")
 
 		
 		local Panel = Create("Frame", AccountOverlay, {
-			Size = UDim2.new(0.64, 0, 0.62, 0),
+			Size = UDim2.new(0.72, 0, 0.9, 0),
 			Position = UDim2.fromScale(0.5, 0.5),
 			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundColor3 = Theme["Color Hub 2"],
@@ -19697,7 +19699,7 @@ local PanelClose = Create("TextButton", Panel, {
 		
 		local AvatarFrame = Create("Frame", Panel, {
 			Size = UDim2.fromOffset(56, 56),
-			Position = UDim2.new(0, 18, 0, 48),
+			Position = UDim2.new(0, 18, 0.1, 0),
 			AnchorPoint = Vector2.new(0, 0),
 			BackgroundTransparency = 1,
 			ZIndex = 52
@@ -19716,7 +19718,7 @@ local PanelClose = Create("TextButton", Panel, {
 
 		local DisplayRow = Create("Frame", Panel, {
 			Size = UDim2.new(1, -100, 0, 22),
-			Position = UDim2.new(0, 86, 0, 49),
+			Position = UDim2.new(0, 86, 0.12, 0),
 			BackgroundTransparency = 1,
 			ZIndex = 52
 		})
@@ -19732,7 +19734,7 @@ local PanelClose = Create("TextButton", Panel, {
 		})
 		local UsernameRow = Create("Frame", Panel, {
 			Size = UDim2.new(1, -100, 0, 20),
-			Position = UDim2.new(0, 86, 0, 72),
+			Position = UDim2.new(0, 86, 0.19, 0),
 			BackgroundTransparency = 1,
 			ZIndex = 52
 		})
@@ -19747,21 +19749,21 @@ local PanelClose = Create("TextButton", Panel, {
 			ZIndex = 52
 		})
 		local AccountTierLabel = Create("TextLabel", Panel, {
-			Size = UDim2.new(1, -20, 0, 15), Position = UDim2.new(0, 86, 0, 94),
+			Size = UDim2.new(1, -20, 0, 15), Position = UDim2.new(0, 86, 0.26, 0),
 			BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 9,
 			Text = ProfileData.Premium and "PREMIUM" or "BASIC",
 			TextColor3 = ProfileData.Premium and Color3.fromRGB(255, 205, 65) or Theme["Color Dark Text"],
 			TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 52
 		})
 			local ThemeDropdown = Create("TextButton", Panel, {
-				Size = UDim2.new(1, -24, 0, 30), Position = UDim2.new(0, 12, 0, 122),
+				Size = UDim2.new(1, -24, 0, 30), Position = UDim2.new(0, 12, 0.34, 0),
 				BackgroundColor3 = Theme["Color Stroke"], TextColor3 = Theme["Color Text"],
 				Font = Enum.Font.GothamMedium, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left,
 				Text = "Tema: " .. tostring(HzsLib.Save.Theme), AutoButtonColor = true, ZIndex = 54
 			})
 			Make("Corner", ThemeDropdown, UDim.new(0, 8))
 			local ThemeMenu = Create("ScrollingFrame", Panel, {
-				Size = UDim2.new(1, -24, 0, 126), Position = UDim2.new(0, 12, 0, 154),
+				Size = UDim2.new(1, -24, 0.34, 0), Position = UDim2.new(0, 12, 0.42, 0),
 				BackgroundColor3 = Theme["Color Hub 2"], BorderSizePixel = 0, ScrollBarThickness = 3,
 				CanvasSize = UDim2.new(0, 0, 0, 0), AutomaticCanvasSize = Enum.AutomaticSize.Y,
 				Visible = false, ZIndex = 60
@@ -19769,6 +19771,39 @@ local PanelClose = Create("TextButton", Panel, {
 			Make("Corner", ThemeMenu, UDim.new(0, 8))
 			Create("UIPadding", ThemeMenu, {PaddingTop = UDim.new(0, 4), PaddingBottom = UDim.new(0, 4), PaddingLeft = UDim.new(0, 4), PaddingRight = UDim.new(0, 7)})
 			Create("UIListLayout", ThemeMenu, {Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder})
+			local ThemeMenuOpen = false
+			local ThemeMenuFullSize = ThemeMenu.Size
+			local ThemeDropdownStroke = InsertTheme(Create("UIStroke", ThemeDropdown, {
+				Color = Theme["Color Theme"], Thickness = 1, Transparency = 0.45
+			}), "Theme")
+			InsertTheme(Create("UIStroke", ThemeMenu, {
+				Color = Theme["Color Stroke"], Thickness = 1, Transparency = 0.08
+			}), "Stroke")
+			local function CloseThemeMenu()
+				if not ThemeMenuOpen then return end
+				ThemeMenuOpen = false
+				CreateTween({ThemeMenu, "Size", UDim2.new(1, -24, 0, 0), 0.18})
+				CreateTween({ThemeMenu, "BackgroundTransparency", 1, 0.18})
+				task.delay(0.2, function()
+					if not ThemeMenuOpen and ThemeMenu.Parent then
+						ThemeMenu.Visible = false
+						ThemeMenu.Size = ThemeMenuFullSize
+						ThemeMenu.BackgroundTransparency = 0
+					end
+				end)
+			end
+			local function ToggleThemeMenu()
+				if ThemeMenuOpen then CloseThemeMenu() return end
+				ThemeMenuOpen = true
+				ThemeMenu.Visible = true
+				ThemeMenu.Size = UDim2.new(1, -24, 0, 0)
+				ThemeMenu.BackgroundTransparency = 1
+				CreateTween({ThemeMenu, "Size", ThemeMenuFullSize, 0.22})
+				CreateTween({ThemeMenu, "BackgroundTransparency", 0, 0.22})
+			end
+			ThemeDropdown.MouseEnter:Connect(function() CreateTween({ThemeDropdownStroke, "Transparency", 0.08, 0.12}) end)
+			ThemeDropdown.MouseLeave:Connect(function() CreateTween({ThemeDropdownStroke, "Transparency", 0.45, 0.12}) end)
+			local ActivateKeyButton
 			local ThemeNames = {}
 			for themeName in pairs(HzsLib.Themes) do
 				if themeName ~= "Christmas" and themeName ~= "Valentine" and themeName ~= "Halloween" then table.insert(ThemeNames, themeName) end
@@ -19780,14 +19815,16 @@ local PanelClose = Create("TextButton", Panel, {
 					Size = UDim2.new(1, -2, 0, 25), BackgroundColor3 = HzsLib.Themes[themeName]["Color Hub 2"],
 					TextColor3 = HzsLib.Themes[themeName]["Color Text"], Font = Enum.Font.GothamMedium,
 					TextSize = 10, Text = themeName, TextXAlignment = Enum.TextXAlignment.Left,
-					LayoutOrder = order, AutoButtonColor = true, ZIndex = 61
+					LayoutOrder = order, AutoButtonColor = false, ZIndex = 61
 				})
 				Make("Corner", choice, UDim.new(0, 6))
 				table.insert(ThemeChoices, choice)
+				choice.MouseEnter:Connect(function() CreateTween({choice, "BackgroundTransparency", 0.12, 0.12}) end)
+				choice.MouseLeave:Connect(function() CreateTween({choice, "BackgroundTransparency", 0, 0.12}) end)
 				choice.Activated:Connect(function()
 					HzsLib:SetTheme(themeName)
 					ThemeDropdown.Text = "Tema: " .. themeName
-					ThemeMenu.Visible = false
+					CloseThemeMenu()
 					Panel.BackgroundColor3 = Theme["Color Hub 2"]
 					AccountOverlay.BackgroundColor3 = Theme["Color Hub 2"]
 					ThemeDropdown.BackgroundColor3 = Theme["Color Stroke"]
@@ -19795,6 +19832,9 @@ local PanelClose = Create("TextButton", Panel, {
 					PanelClose.BackgroundColor3 = Theme["Color Stroke"]
 					PanelClose.TextColor3 = Theme["Color Text"]
 					ThemeMenu.BackgroundColor3 = Theme["Color Hub 2"]
+					ThemeMenu.ScrollBarImageColor3 = Theme["Color Theme"]
+					ActivateKeyButton.BackgroundColor3 = ProfileData.Premium and Color3.fromRGB(45, 145, 90) or Theme["Color Theme"]
+					ActivateKeyButton.TextColor3 = Color3.new(1, 1, 1)
 					for _, object in ipairs(Panel:GetDescendants()) do
 						if object:IsA("TextLabel") then
 							object.TextColor3 = object == AccountTierLabel and ProfileData.Premium and Color3.fromRGB(255, 205, 65) or Theme["Color Text"]
@@ -19819,13 +19859,13 @@ local PanelClose = Create("TextButton", Panel, {
 					if FooterStatus then FooterStatus.TextColor3 = ProfileData.Premium and Color3.fromRGB(255, 205, 65) or Theme["Color Dark Text"] end
 				end)
 			end
-			ThemeDropdown.Activated:Connect(function() ThemeMenu.Visible = not ThemeMenu.Visible end)
+			ThemeDropdown.Activated:Connect(ToggleThemeMenu)
 
 
 			local function MakeEditField(label, yPos, field)
 				local row = Create("Frame", Panel, {
-					Size = UDim2.new(1, -20, 0, 26),
-					Position = UDim2.new(0, 10, 0, yPos),
+					Size = UDim2.new(1, -24, 0, 26),
+					Position = UDim2.new(0, 12, yPos, 0),
 					BackgroundColor3 = Theme["Color Stroke"],
 					BackgroundTransparency = 0.6,
 					ZIndex = 52
@@ -19873,11 +19913,11 @@ local PanelClose = Create("TextButton", Panel, {
 				end)
 				return row
 			end
-			MakeEditField("Nome:", 166, "DisplayName")
-			MakeEditField("Usuário:", 198, "Username")
+			MakeEditField("Nome:", 0.49, "DisplayName")
+			MakeEditField("Usuário:", 0.59, "Username")
 
 			local ProfileKeyRow = Create("Frame", Panel, {
-			Size = UDim2.new(1, -24, 0, 26), Position = UDim2.new(0, 12, 0, 230),
+			Size = UDim2.new(1, -24, 0, 26), Position = UDim2.new(0, 12, 0.69, 0),
 			BackgroundColor3 = Theme["Color Stroke"], BackgroundTransparency = 0.6, ZIndex = 52
 		})
 		Make("Corner", ProfileKeyRow, UDim.new(0, 9))
@@ -19889,8 +19929,8 @@ local PanelClose = Create("TextButton", Panel, {
 			PlaceholderColor3 = Theme["Color Dark Text"], TextXAlignment = Enum.TextXAlignment.Left,
 			ClearTextOnFocus = false, ZIndex = 53
 		})
-		local ActivateKeyButton = Create("TextButton", Panel, {
-			Size = UDim2.new(1, -24, 0, 25), Position = UDim2.new(0, 12, 0, 264),
+		ActivateKeyButton = Create("TextButton", Panel, {
+			Size = UDim2.new(1, -24, 0, 25), Position = UDim2.new(0, 12, 0.79, 0),
 			BackgroundColor3 = ProfileData.Premium and Color3.fromRGB(45, 145, 90) or Theme["Color Theme"],
 			Font = Enum.Font.GothamBold, TextSize = 10, TextColor3 = Color3.new(1, 1, 1),
 			Text = ProfileData.Premium and "Premium ativo" or "Ativar key",
@@ -19924,7 +19964,7 @@ local PanelClose = Create("TextButton", Panel, {
 		
 		local LogoutBtn = Create("TextButton", Panel, {
 			Size = UDim2.new(1, -24, 0, 28),
-			Position = UDim2.new(0, 12, 0, 304),
+			Position = UDim2.new(0, 12, 0.89, 0),
 			BackgroundColor3 = Color3.fromRGB(122, 42, 55),
 			BackgroundTransparency = 0.1,
 			Font = Enum.Font.GothamBold,
@@ -19948,7 +19988,7 @@ local PanelClose = Create("TextButton", Panel, {
 
 		
 		Panel.Size = UDim2.fromScale(0, 0)
-		CreateTween({Panel, "Size", UDim2.new(0.64, 0, 0.62, 0), 0.25})
+		CreateTween({Panel, "Size", UDim2.new(0.72, 0, 0.9, 0), 0.25})
 	end
 
 	
