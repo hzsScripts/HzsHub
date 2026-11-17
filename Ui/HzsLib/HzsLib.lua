@@ -19651,7 +19651,7 @@ CloseButton:SetAttribute("Snd", "Close")
 			Size = UDim2.fromScale(1, 1),
 			Position = UDim2.fromScale(0, 0),
 			BackgroundColor3 = Theme["Color Hub 2"],
-			BackgroundTransparency = 0,
+			BackgroundTransparency = 0.16,
 			ZIndex = 50,
 			Name = "AccountOverlay",
 			Active = true
@@ -19661,9 +19661,9 @@ CloseButton:SetAttribute("Snd", "Close")
 
 		
 		local Panel = Create("Frame", AccountOverlay, {
-			Size = UDim2.fromScale(1, 1),
-			Position = UDim2.fromScale(0, 0),
-			AnchorPoint = Vector2.new(0, 0),
+			Size = UDim2.new(0.64, 0, 0.62, 0),
+			Position = UDim2.fromScale(0.5, 0.5),
+			AnchorPoint = Vector2.new(0.5, 0.5),
 			BackgroundColor3 = Theme["Color Hub 2"],
 			BackgroundTransparency = 0,
 			ZIndex = 51,
@@ -19696,18 +19696,13 @@ local PanelClose = Create("TextButton", Panel, {
 
 		
 		local AvatarFrame = Create("Frame", Panel, {
-			Size = UDim2.fromOffset(70, 70),
-			Position = UDim2.new(0.5, 0, 0, 20),
-			AnchorPoint = Vector2.new(0.5, 0),
-			BackgroundColor3 = Theme["Color Stroke"],
+			Size = UDim2.fromOffset(56, 56),
+			Position = UDim2.new(0, 18, 0, 48),
+			AnchorPoint = Vector2.new(0, 0),
+			BackgroundTransparency = 1,
 			ZIndex = 52
 		})
 		Make("Corner", AvatarFrame, UDim.new(0.5, 0))
-		Create("UIStroke", AvatarFrame, {
-			Color = Theme["Color Theme"],
-			Thickness = 2,
-			ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		})
 
 		local AvatarImg = Create("ImageLabel", AvatarFrame, {
 			Size = UDim2.fromScale(1, 1),
@@ -19720,8 +19715,8 @@ local PanelClose = Create("TextButton", Panel, {
 		
 
 		local DisplayRow = Create("Frame", Panel, {
-			Size = UDim2.new(1, -20, 0, 28),
-			Position = UDim2.new(0, 10, 0, 100),
+			Size = UDim2.new(1, -100, 0, 22),
+			Position = UDim2.new(0, 86, 0, 49),
 			BackgroundTransparency = 1,
 			ZIndex = 52
 		})
@@ -19736,8 +19731,8 @@ local PanelClose = Create("TextButton", Panel, {
 			ZIndex = 52
 		})
 		local UsernameRow = Create("Frame", Panel, {
-			Size = UDim2.new(1, -20, 0, 22),
-			Position = UDim2.new(0, 10, 0, 134),
+			Size = UDim2.new(1, -100, 0, 20),
+			Position = UDim2.new(0, 86, 0, 72),
 			BackgroundTransparency = 1,
 			ZIndex = 52
 		})
@@ -19752,21 +19747,21 @@ local PanelClose = Create("TextButton", Panel, {
 			ZIndex = 52
 		})
 		local AccountTierLabel = Create("TextLabel", Panel, {
-			Size = UDim2.new(1, -20, 0, 15), Position = UDim2.new(0, 10, 0, 158),
+			Size = UDim2.new(1, -20, 0, 15), Position = UDim2.new(0, 86, 0, 94),
 			BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 9,
 			Text = ProfileData.Premium and "PREMIUM" or "BASIC",
 			TextColor3 = ProfileData.Premium and Color3.fromRGB(255, 205, 65) or Theme["Color Dark Text"],
 			TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 52
 		})
 			local ThemeDropdown = Create("TextButton", Panel, {
-				Size = UDim2.new(1, -20, 0, 27), Position = UDim2.new(0, 10, 0, 178),
+				Size = UDim2.new(1, -24, 0, 30), Position = UDim2.new(0, 12, 0, 122),
 				BackgroundColor3 = Theme["Color Stroke"], TextColor3 = Theme["Color Text"],
 				Font = Enum.Font.GothamMedium, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left,
 				Text = "Tema: " .. tostring(HzsLib.Save.Theme), AutoButtonColor = true, ZIndex = 54
 			})
 			Make("Corner", ThemeDropdown, UDim.new(0, 8))
 			local ThemeMenu = Create("ScrollingFrame", Panel, {
-				Size = UDim2.new(1, -20, 0, 126), Position = UDim2.new(0, 10, 0, 207),
+				Size = UDim2.new(1, -24, 0, 126), Position = UDim2.new(0, 12, 0, 154),
 				BackgroundColor3 = Theme["Color Hub 2"], BorderSizePixel = 0, ScrollBarThickness = 3,
 				CanvasSize = UDim2.new(0, 0, 0, 0), AutomaticCanvasSize = Enum.AutomaticSize.Y,
 				Visible = false, ZIndex = 60
@@ -19878,11 +19873,11 @@ local PanelClose = Create("TextButton", Panel, {
 				end)
 				return row
 			end
-			MakeEditField("Nome:", 212, "DisplayName")
-			MakeEditField("Usuário:", 244, "Username")
+			MakeEditField("Nome:", 166, "DisplayName")
+			MakeEditField("Usuário:", 198, "Username")
 
 			local ProfileKeyRow = Create("Frame", Panel, {
-			Size = UDim2.new(1, -20, 0, 26), Position = UDim2.new(0, 10, 0, 276),
+			Size = UDim2.new(1, -24, 0, 26), Position = UDim2.new(0, 12, 0, 230),
 			BackgroundColor3 = Theme["Color Stroke"], BackgroundTransparency = 0.6, ZIndex = 52
 		})
 		Make("Corner", ProfileKeyRow, UDim.new(0, 9))
@@ -19895,7 +19890,7 @@ local PanelClose = Create("TextButton", Panel, {
 			ClearTextOnFocus = false, ZIndex = 53
 		})
 		local ActivateKeyButton = Create("TextButton", Panel, {
-			Size = UDim2.new(1, -20, 0, 25), Position = UDim2.new(0, 10, 0, 308),
+			Size = UDim2.new(1, -24, 0, 25), Position = UDim2.new(0, 12, 0, 264),
 			BackgroundColor3 = ProfileData.Premium and Color3.fromRGB(45, 145, 90) or Theme["Color Theme"],
 			Font = Enum.Font.GothamBold, TextSize = 10, TextColor3 = Color3.new(1, 1, 1),
 			Text = ProfileData.Premium and "Premium ativo" or "Ativar key",
@@ -19928,15 +19923,15 @@ local PanelClose = Create("TextButton", Panel, {
 
 		
 		local LogoutBtn = Create("TextButton", Panel, {
-			Size = UDim2.new(1, -20, 0, 28),
-			Position = UDim2.new(0, 10, 1, -32),
-			BackgroundColor3 = Color3.fromRGB(200, 50, 50),
+			Size = UDim2.new(1, -24, 0, 28),
+			Position = UDim2.new(0, 12, 0, 304),
+			BackgroundColor3 = Color3.fromRGB(122, 42, 55),
 			BackgroundTransparency = 0.1,
 			Font = Enum.Font.GothamBold,
 			TextSize = 11,
 			TextColor3 = Color3.fromRGB(255, 255, 255),
 			Text = "Sair da conta",
-			TextXAlignment = "Left",
+			TextXAlignment = Enum.TextXAlignment.Center,
 			AutoButtonColor = false,
 			ZIndex = 52
 		})
@@ -19953,7 +19948,7 @@ local PanelClose = Create("TextButton", Panel, {
 
 		
 		Panel.Size = UDim2.fromScale(0, 0)
-		CreateTween({Panel, "Size", UDim2.fromScale(1, 1), 0.25})
+		CreateTween({Panel, "Size", UDim2.new(0.64, 0, 0.62, 0), 0.25})
 	end
 
 	
@@ -19971,7 +19966,6 @@ local PanelClose = Create("TextButton", Panel, {
 		Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=100&h=100", AutoButtonColor = false, ZIndex = 6
 	})
 	Make("Corner", FooterAvatar, UDim.new(0.5, 0))
-	Create("UIStroke", FooterAvatar, {Color = Theme["Color Theme"], Thickness = 1.5})
 	FooterName = Create("TextLabel", ProfileCard, {
 		Size = UDim2.new(1, -50, 0, 15), Position = UDim2.new(0, 45, 0, 3),
 		BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 10,
