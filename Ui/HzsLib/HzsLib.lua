@@ -3339,7 +3339,7 @@ function HzsLib:MakeWindow(Configs)
 				end
 				
 				local function CallbackSelected()
-					SetFlag(Flag, if MultiSelect then Selected else tostring(Selected or "..."))
+					SetFlag(Flag, MultiSelect and Selected or tostring(Selected or "..."))
 					Funcs:FireCallback(Callback, Selected)
 				end
 				
