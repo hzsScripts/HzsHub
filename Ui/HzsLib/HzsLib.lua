@@ -61,7 +61,7 @@ local function GetSeasonalTheme()
 	if (m == 10 and day >= 15) or (m == 11 and day <= 2) then
 		return "Halloween"
 	elseif (m == 12) or (m == 1 and day <= 6) then
-		return "Natal"
+		return "Christmas"
 	elseif (m == 2 and day >= 10 and day <= 16) or (m == 6 and day >= 8 and day <= 14) then
 		return "Valentine"
 	end
@@ -72,15 +72,15 @@ local HzsLib = {
 	Themes = {
 		White = {
 			["Color Hub 1"] = ColorSequence.new({
-				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(240, 240, 248)),
-				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(220, 220, 235)),
-				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(240, 240, 248))
+				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(7, 7, 10)),
+				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(19, 12, 18)),
+				ColorSequenceKeypoint.new(1.00, Color3.fromRGB(7, 7, 10))
 			}),
-			["Color Hub 2"] = Color3.fromRGB(248, 248, 255),
-			["Color Stroke"] = Color3.fromRGB(180, 160, 200),
-			["Color Theme"] = Color3.fromRGB(150, 80, 220),
-			["Color Text"] = Color3.fromRGB(30, 20, 40),
-			["Color Dark Text"] = Color3.fromRGB(100, 90, 120)
+			["Color Hub 2"] = Color3.fromRGB(13, 12, 16),
+			["Color Stroke"] = Color3.fromRGB(76, 39, 62),
+			["Color Theme"] = Color3.fromRGB(255, 78, 166),
+			["Color Text"] = Color3.fromRGB(250, 247, 250),
+			["Color Dark Text"] = Color3.fromRGB(190, 174, 188)
 		},
 		Dark = {
 			["Color Hub 1"] = ColorSequence.new({
@@ -94,7 +94,27 @@ local HzsLib = {
 			["Color Text"] = Color3.fromRGB(255, 255, 255),
 			["Color Dark Text"] = Color3.fromRGB(190, 170, 182)
 		},
-		Natal = {
+		Rose = {
+			["Color Hub 1"] = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(10, 6, 12)), ColorSequenceKeypoint.new(0.5, Color3.fromRGB(29, 12, 23)), ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 6, 12))}),
+			["Color Hub 2"] = Color3.fromRGB(16, 11, 18), ["Color Stroke"] = Color3.fromRGB(93, 43, 75),
+			["Color Theme"] = Color3.fromRGB(255, 95, 177), ["Color Text"] = Color3.fromRGB(252, 246, 251), ["Color Dark Text"] = Color3.fromRGB(196, 174, 191)
+		},
+		Ocean = {
+			["Color Hub 1"] = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(5, 9, 15)), ColorSequenceKeypoint.new(0.5, Color3.fromRGB(9, 20, 32)), ColorSequenceKeypoint.new(1, Color3.fromRGB(5, 9, 15))}),
+			["Color Hub 2"] = Color3.fromRGB(9, 16, 25), ["Color Stroke"] = Color3.fromRGB(34, 75, 101),
+			["Color Theme"] = Color3.fromRGB(64, 201, 230), ["Color Text"] = Color3.fromRGB(242, 249, 252), ["Color Dark Text"] = Color3.fromRGB(164, 194, 207)
+		},
+		Amethyst = {
+			["Color Hub 1"] = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(9, 7, 16)), ColorSequenceKeypoint.new(0.5, Color3.fromRGB(20, 14, 35)), ColorSequenceKeypoint.new(1, Color3.fromRGB(9, 7, 16))}),
+			["Color Hub 2"] = Color3.fromRGB(15, 12, 26), ["Color Stroke"] = Color3.fromRGB(73, 55, 117),
+			["Color Theme"] = Color3.fromRGB(172, 133, 255), ["Color Text"] = Color3.fromRGB(248, 245, 255), ["Color Dark Text"] = Color3.fromRGB(185, 174, 211)
+		},
+		Forest = {
+			["Color Hub 1"] = ColorSequence.new({ColorSequenceKeypoint.new(0, Color3.fromRGB(5, 11, 9)), ColorSequenceKeypoint.new(0.5, Color3.fromRGB(11, 25, 19)), ColorSequenceKeypoint.new(1, Color3.fromRGB(5, 11, 9))}),
+			["Color Hub 2"] = Color3.fromRGB(9, 18, 14), ["Color Stroke"] = Color3.fromRGB(42, 86, 65),
+			["Color Theme"] = Color3.fromRGB(88, 219, 151), ["Color Text"] = Color3.fromRGB(243, 250, 246), ["Color Dark Text"] = Color3.fromRGB(170, 199, 183)
+		},
+		Christmas = {
 			["Color Hub 1"] = ColorSequence.new({
 				ColorSequenceKeypoint.new(0.00, Color3.fromRGB(35, 12, 18)),
 				ColorSequenceKeypoint.new(0.50, Color3.fromRGB(12, 28, 18)),
@@ -18541,6 +18561,7 @@ local ViewportSize = workspace.CurrentCamera.ViewportSize
 local UIScale = ViewportSize.Y / 450
 
 local Settings = HzsLib.Settings
+Settings.AutoSave = Settings.AutoSave ~= false
 local Flags = HzsLib.Flags
 
 local SetProps, SetChildren, InsertTheme, Create do
@@ -18720,7 +18741,7 @@ local GetFlag, SetFlag, CheckFlag do
 	local db
 	Connection.FlagsChanged:Connect(function(Flag, Value)
 		local ScriptFile = Settings.ScriptFile
-		if not db and ScriptFile and writefile then
+		if Settings.AutoSave ~= false and not db and ScriptFile and writefile then
 			db=true;task.wait(0.1);db=false
 			local Success, Encoded = pcall(function()
 				return HttpService:JSONEncode(Flags)
@@ -19147,6 +19168,22 @@ function HzsLib:SetSoundId(Name, Id)
 	self.Sounds[Name] = Id
 end
 
+function HzsLib:SetAutoSave(Enabled, FilePath)
+	Settings.AutoSave = Enabled ~= false
+	if type(FilePath) == "string" and FilePath ~= "" then Settings.ScriptFile = FilePath end
+	return Settings.AutoSave, Settings.ScriptFile
+end
+
+function HzsLib:SaveSettings(FilePath)
+	local target = FilePath or Settings.ScriptFile
+	if not target or not writefile then return false end
+	local ok, encoded = pcall(function() return HttpService:JSONEncode(Flags) end)
+	if not ok then return false, encoded end
+	local saved, err = pcall(writefile, target, encoded)
+	if saved then Connection:FireConnection("FileSaved", "Script-Flags", target, encoded) end
+	return saved, err
+end
+
 function HzsLib:SetTheme(NewTheme)
 	if not VerifyTheme(NewTheme) then return end
 	
@@ -19184,10 +19221,16 @@ end
 
 function HzsLib:MakeWindow(Configs)
 	if type(Configs.PremiumKeyValidator) == "function" then self:SetPremiumKeyValidator(Configs.PremiumKeyValidator) end
-	local WTitle = Configs[1] or Configs.Name or Configs.Title or "HzsLib"
+	local WTitle = Configs[1] or Configs.Name or Configs.Title or "HzsHub"
 	local WMiniText = Configs[2] or Configs.SubTitle or "v1.1.0"
 	
-	Settings.ScriptFile = Configs[3] or Configs.SaveFolder or false
+	local RequestedSettingsFile = Configs[3] or Configs.SaveFolder
+		if type(RequestedSettingsFile) == "string" and RequestedSettingsFile ~= "" then
+			Settings.ScriptFile = RequestedSettingsFile
+		elseif not Settings.ScriptFile then
+			Settings.ScriptFile = SETTINGS_FOLDER .. "/Flags_" .. tostring(Player.UserId) .. "_" .. tostring(game.PlaceId) .. ".json"
+		end
+		if Configs.AutoSave ~= nil then Settings.AutoSave = Configs.AutoSave ~= false end
 	
 	local function LoadFile()
 		local File = Settings.ScriptFile
@@ -19220,7 +19263,7 @@ function HzsLib:MakeWindow(Configs)
 	
 	
 	Create("UIStroke", MainFrame, {
-		Color = Color3.fromRGB(180, 160, 220),
+		Color = Theme["Color Stroke"],
 		Thickness = 1.5,
 		Transparency = 0,
 		ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
@@ -19360,9 +19403,9 @@ function HzsLib:MakeWindow(Configs)
 	
 	local SearchH = 30
 	local MainScroll = InsertTheme(Create("ScrollingFrame", Components, {
-		Size = UDim2.new(0, HzsLib.Save.TabSize, 1, -TopBar.Size.Y.Offset - 72 - SearchH),
+		Size = UDim2.new(0, HzsLib.Save.TabSize, 1, -TopBar.Size.Y.Offset - 82 - SearchH),
 		ScrollBarImageColor3 = Theme["Color Theme"],
-		Position = UDim2.new(0, 0, 1, -62),
+		Position = UDim2.new(0, 0, 1, -72),
 		AnchorPoint = Vector2.new(0, 1),
 		ScrollBarThickness = 1.5,
 		BackgroundTransparency = 1,
@@ -19413,8 +19456,8 @@ function HzsLib:MakeWindow(Configs)
 		ControlSize1.Position = UDim2.fromOffset(math.clamp(Pos1.X.Offset, 430, 1000), math.clamp(Pos1.Y.Offset, 200, 500))
 		ControlSize2.Position = UDim2.new(0, math.clamp(Pos2.X.Offset, 135, 250), 1, 0)
 		
-		MainScroll.Size = UDim2.new(0, ControlSize2.Position.X.Offset, 1, -TopBar.Size.Y.Offset - 72 - SearchH)
-			MainScroll.Position = UDim2.new(0, 0, 1, -62)
+		MainScroll.Size = UDim2.new(0, ControlSize2.Position.X.Offset, 1, -TopBar.Size.Y.Offset - 82 - SearchH)
+			MainScroll.Position = UDim2.new(0, 0, 1, -72)
 		Containers.Size = UDim2.new(1, -MainScroll.Size.X.Offset, 1, -TopBar.Size.Y.Offset - 14)
 		MainFrame.Size = ControlSize1.Position
 	end
@@ -19570,34 +19613,13 @@ function HzsLib:MakeWindow(Configs)
 		Image = "rbxassetid://10734896206",
 		Name = "Minimize"
 	})
-
-	
-	local ProfileButton = Create("ImageButton", TopBar, {
-		Size = UDim2.new(0, 20, 0, 20),
-		Position = UDim2.new(1, -58, 0.5),
-		AnchorPoint = Vector2.new(1, 0.5),
-		BackgroundTransparency = 1,
-		Image = HzsLib:GetIcon("settings"), 
-		ImageColor3 = Theme["Color Theme"],
-		AutoButtonColor = false,
-		Name = "ProfileBtn"
-	})
-	
-	SetChildren(ButtonsFolder, {
-		CloseButton,
-		MinimizeButton
-	})
-	
-	ProfileButton.Parent = TopBar
-
-	CloseButton:SetAttribute("Snd", "Close")
+		SetChildren(ButtonsFolder, {CloseButton, MinimizeButton})
+CloseButton:SetAttribute("Snd", "Close")
 	
 	CloseButton.MouseEnter:Connect(function() CreateTween({CloseButton, "ImageColor3", Color3.fromRGB(255, 90, 90), 0.15}) end)
 	CloseButton.MouseLeave:Connect(function() CreateTween({CloseButton, "ImageColor3", Theme["Color Text"], 0.15}) end)
 	MinimizeButton.MouseEnter:Connect(function() CreateTween({MinimizeButton, "ImageColor3", Color3.fromRGB(200, 200, 200), 0.15}) end)
 	MinimizeButton.MouseLeave:Connect(function() CreateTween({MinimizeButton, "ImageColor3", Theme["Color Text"], 0.15}) end)
-	ProfileButton.MouseEnter:Connect(function() CreateTween({ProfileButton, "ImageColor3", Color3.fromRGB(255, 255, 255), 0.15}) end)
-	ProfileButton.MouseLeave:Connect(function() CreateTween({ProfileButton, "ImageColor3", Theme["Color Theme"], 0.15}) end)
 	
 	local Minimized, SaveSize, WaitClick
 	local Window, FirstTab = {}, false
@@ -19605,7 +19627,7 @@ function HzsLib:MakeWindow(Configs)
 	
 	
 	
-	local FooterName, FooterUser
+	local FooterName, FooterUser, FooterStatus, ProfileCard, FooterAvatar
 	local AccountPanelOpen = false
 	local AccountOverlay
 
@@ -19625,8 +19647,9 @@ function HzsLib:MakeWindow(Configs)
 		
 		AccountOverlay = Create("Frame", MainFrame, {
 			Size = UDim2.fromScale(1, 1),
-			BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-			BackgroundTransparency = 0.3,
+			Position = UDim2.fromScale(0, 0),
+			BackgroundColor3 = Theme["Color Hub 2"],
+			BackgroundTransparency = 0,
 			ZIndex = 50,
 			Name = "AccountOverlay",
 			Active = true
@@ -19636,11 +19659,11 @@ function HzsLib:MakeWindow(Configs)
 
 		
 		local Panel = Create("Frame", AccountOverlay, {
-			Size = UDim2.fromOffset(320, 370),
-			Position = UDim2.fromScale(0.5, 0.5),
-			AnchorPoint = Vector2.new(0.5, 0.5),
+			Size = UDim2.fromScale(1, 1),
+			Position = UDim2.fromScale(0, 0),
+			AnchorPoint = Vector2.new(0, 0),
 			BackgroundColor3 = Theme["Color Hub 2"],
-			BackgroundTransparency = 0.05,
+			BackgroundTransparency = 0,
 			ZIndex = 51,
 			Name = "AccountPanel"
 		})
@@ -19653,7 +19676,14 @@ function HzsLib:MakeWindow(Configs)
 		Make("Gradient", Panel, {Rotation = 45})
 
 		
-		local PanelClose = Create("ImageButton", Panel, {
+		
+			Create("TextLabel", Panel, {
+				Size = UDim2.new(1, -60, 0, 18), Position = UDim2.new(0, 12, 0, 2),
+				BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 12,
+				Text = "HzsHub  •  Perfil", TextColor3 = Theme["Color Text"],
+				TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 52
+			})
+local PanelClose = Create("ImageButton", Panel, {
 			Size = UDim2.fromOffset(16, 16),
 			Position = UDim2.new(1, -10, 0, 10),
 			AnchorPoint = Vector2.new(1, 0),
@@ -19691,17 +19721,7 @@ function HzsLib:MakeWindow(Configs)
 		Make("Corner", AvatarImg, UDim.new(0.5, 0))
 
 		
-		local InfoShown = false
-		local InfoFrame
-		AvatarFrame.InputBegan:Connect(function(inp)
-			if inp.UserInputType ~= Enum.UserInputType.MouseButton1 and inp.UserInputType ~= Enum.UserInputType.Touch then return end
-			InfoShown = not InfoShown
-			if InfoFrame then
-				InfoFrame.Visible = InfoShown
-			end
-		end)
 
-		
 		local NameHidden = false
 		local function MaskedName(name, hidden)
 			if hidden then
@@ -19749,7 +19769,7 @@ function HzsLib:MakeWindow(Configs)
 		local UsernameHidden = false
 		local UsernameRow = Create("Frame", Panel, {
 			Size = UDim2.new(1, -20, 0, 22),
-			Position = UDim2.new(0, 10, 0, 130),
+			Position = UDim2.new(0, 10, 0, 134),
 			BackgroundTransparency = 1,
 			ZIndex = 52
 		})
@@ -19781,9 +19801,83 @@ function HzsLib:MakeWindow(Configs)
 		end)
 
 		
+		local AccountTierLabel = Create("TextLabel", Panel, {
+			Size = UDim2.new(1, -20, 0, 15), Position = UDim2.new(0, 10, 0, 158),
+			BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 9,
+			Text = ProfileData.Premium and "PREMIUM" or "BASIC",
+			TextColor3 = ProfileData.Premium and Color3.fromRGB(255, 205, 65) or Theme["Color Dark Text"],
+			TextXAlignment = Enum.TextXAlignment.Left, ZIndex = 52
+		})
+			local ThemeDropdown = Create("TextButton", Panel, {
+				Size = UDim2.new(1, -20, 0, 27), Position = UDim2.new(0, 10, 0, 178),
+				BackgroundColor3 = Theme["Color Stroke"], TextColor3 = Theme["Color Text"],
+				Font = Enum.Font.GothamMedium, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left,
+				Text = "  Tema: " .. tostring(HzsLib.Save.Theme) .. "    ▾", AutoButtonColor = true, ZIndex = 54
+			})
+			Make("Corner", ThemeDropdown, UDim.new(0, 8))
+			local ThemeMenu = Create("ScrollingFrame", Panel, {
+				Size = UDim2.new(1, -20, 0, 126), Position = UDim2.new(0, 10, 0, 207),
+				BackgroundColor3 = Theme["Color Hub 2"], BorderSizePixel = 0, ScrollBarThickness = 3,
+				CanvasSize = UDim2.new(0, 0, 0, 0), AutomaticCanvasSize = Enum.AutomaticSize.Y,
+				Visible = false, ZIndex = 60
+			})
+			Make("Corner", ThemeMenu, UDim.new(0, 8))
+			Create("UIPadding", ThemeMenu, {PaddingTop = UDim.new(0, 4), PaddingBottom = UDim.new(0, 4), PaddingLeft = UDim.new(0, 4), PaddingRight = UDim.new(0, 7)})
+			Create("UIListLayout", ThemeMenu, {Padding = UDim.new(0, 2), SortOrder = Enum.SortOrder.LayoutOrder})
+			local ThemeNames = {}
+			for themeName in pairs(HzsLib.Themes) do
+				if themeName ~= "Christmas" and themeName ~= "Valentine" and themeName ~= "Halloween" then table.insert(ThemeNames, themeName) end
+			end
+			table.sort(ThemeNames)
+			local ThemeChoices = {}
+			for order, themeName in ipairs(ThemeNames) do
+				local choice = Create("TextButton", ThemeMenu, {
+					Size = UDim2.new(1, -2, 0, 25), BackgroundColor3 = HzsLib.Themes[themeName]["Color Hub 2"],
+					TextColor3 = HzsLib.Themes[themeName]["Color Text"], Font = Enum.Font.GothamMedium,
+					TextSize = 10, Text = "  " .. themeName, TextXAlignment = Enum.TextXAlignment.Left,
+					LayoutOrder = order, AutoButtonColor = true, ZIndex = 61
+				})
+				Make("Corner", choice, UDim.new(0, 6))
+				table.insert(ThemeChoices, choice)
+				choice.Activated:Connect(function()
+					HzsLib:SetTheme(themeName)
+					ThemeDropdown.Text = "  Tema: " .. themeName .. "    ▾"
+					ThemeMenu.Visible = false
+					Panel.BackgroundColor3 = Theme["Color Hub 2"]
+					AccountOverlay.BackgroundColor3 = Theme["Color Hub 2"]
+					ThemeDropdown.BackgroundColor3 = Theme["Color Stroke"]
+					ThemeDropdown.TextColor3 = Theme["Color Text"]
+					ThemeMenu.BackgroundColor3 = Theme["Color Hub 2"]
+					for _, object in ipairs(Panel:GetDescendants()) do
+						if object:IsA("TextLabel") then
+							object.TextColor3 = object == AccountTierLabel and ProfileData.Premium and Color3.fromRGB(255, 205, 65) or Theme["Color Text"]
+						elseif object:IsA("TextBox") then
+							object.TextColor3 = Theme["Color Text"]
+							object.PlaceholderColor3 = Theme["Color Dark Text"]
+						elseif object:IsA("ImageButton") then
+							object.ImageColor3 = Theme["Color Theme"]
+						elseif object:IsA("Frame") and object ~= Panel and object.BackgroundTransparency < 1 then
+							object.BackgroundColor3 = Theme["Color Stroke"]
+						elseif object:IsA("UIStroke") then
+							object.Color = Theme["Color Stroke"]
+						end
+					end
+					for _, option in ipairs(ThemeChoices) do
+						local optionName = option.Text:gsub("^%s+", "")
+						option.BackgroundColor3 = HzsLib.Themes[optionName]["Color Hub 2"]
+						option.TextColor3 = HzsLib.Themes[optionName]["Color Text"]
+					end
+					if FooterName then FooterName.TextColor3 = Theme["Color Text"] end
+					if FooterUser then FooterUser.TextColor3 = Theme["Color Dark Text"] end
+					if FooterStatus then FooterStatus.TextColor3 = ProfileData.Premium and Color3.fromRGB(255, 205, 65) or Theme["Color Dark Text"] end
+				end)
+			end
+			ThemeDropdown.Activated:Connect(function() ThemeMenu.Visible = not ThemeMenu.Visible end)
+
+
 		Create("Frame", Panel, {
 			Size = UDim2.new(1, -20, 0, 1),
-			Position = UDim2.new(0, 10, 0, 160),
+			Position = UDim2.new(0, 10, 0, 174),
 			BackgroundColor3 = Theme["Color Stroke"],
 			BackgroundTransparency = 0.5,
 			BorderSizePixel = 0,
@@ -19843,13 +19937,13 @@ function HzsLib:MakeWindow(Configs)
 			return row
 		end
 
-		MakeEditField("Nome:", 170, "DisplayName")
-		MakeEditField("Usuário:", 202, "Username")
+		MakeEditField("Nome:", 212, "DisplayName")
+		MakeEditField("Usuário:", 244, "Username")
 
 		
 		local PwRow = Create("Frame", Panel, {
 			Size = UDim2.new(1, -20, 0, 26),
-			Position = UDim2.new(0, 10, 0, 234),
+			Position = UDim2.new(0, 10, 0, 276),
 			BackgroundColor3 = Theme["Color Stroke"],
 			BackgroundTransparency = 0.6,
 			ZIndex = 52
@@ -19887,7 +19981,7 @@ function HzsLib:MakeWindow(Configs)
 
 		
 		local ProfileKeyRow = Create("Frame", Panel, {
-			Size = UDim2.new(1, -20, 0, 26), Position = UDim2.new(0, 10, 0, 266),
+			Size = UDim2.new(1, -20, 0, 26), Position = UDim2.new(0, 10, 0, 308),
 			BackgroundColor3 = Theme["Color Stroke"], BackgroundTransparency = 0.6, ZIndex = 52
 		})
 		Make("Corner", ProfileKeyRow, UDim.new(0, 9))
@@ -19900,7 +19994,7 @@ function HzsLib:MakeWindow(Configs)
 			ClearTextOnFocus = false, ZIndex = 53
 		})
 		local ActivateKeyButton = Create("TextButton", Panel, {
-			Size = UDim2.new(1, -20, 0, 25), Position = UDim2.new(0, 10, 0, 298),
+			Size = UDim2.new(1, -20, 0, 25), Position = UDim2.new(0, 10, 0, 340),
 			BackgroundColor3 = ProfileData.Premium and Color3.fromRGB(45, 145, 90) or Theme["Color Theme"],
 			Font = Enum.Font.GothamBold, TextSize = 10, TextColor3 = Color3.new(1, 1, 1),
 			Text = ProfileData.Premium and "Premium ativo" or "Ativar key",
@@ -19919,6 +20013,9 @@ function HzsLib:MakeWindow(Configs)
 			if not ok or valid ~= true then ProfileKeyBox.Text = "Key inválida" return end
 			ProfileData.Premium = true
 			SaveProfile()
+			AccountTierLabel.Text = "PREMIUM"
+			AccountTierLabel.TextColor3 = Color3.fromRGB(255, 205, 65)
+			if FooterStatus then FooterStatus.Text = "PREMIUM" FooterStatus.TextColor3 = Color3.fromRGB(255, 205, 65) end
 			ProfileKeyBox.Text = ""
 			ProfileKeyBox.PlaceholderText = "Premium ativo nesta conta"
 			ProfileKeyBox.TextEditable = false
@@ -19929,38 +20026,9 @@ function HzsLib:MakeWindow(Configs)
 		if ProfileData.Premium then ProfileKeyBox.TextEditable = false end
 
 		
-		InfoFrame = Create("Frame", Panel, {
-			Size = UDim2.new(1, -20, 0, 60),
-			Position = UDim2.new(0, 10, 0, 266),
-			BackgroundColor3 = Theme["Color Hub 2"],
-			BackgroundTransparency = 0.1,
-			ZIndex = 52,
-			Visible = false
-		})
-		Make("Corner", InfoFrame, UDim.new(0, 10))
-		Create("UIStroke", InfoFrame, {
-			Color = Theme["Color Stroke"],
-			Thickness = 1,
-			ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-		})
-		Create("TextLabel", InfoFrame, {
-			Size = UDim2.fromScale(1, 1),
-			BackgroundTransparency = 1,
-			Font = Enum.Font.Gotham,
-			TextSize = 9,
-			TextColor3 = Theme["Color Dark Text"],
-			TextXAlignment = "Left",
-			TextYAlignment = "Top",
-			Text = "UserId: " .. Player.UserId .. "\nDisplay: " .. Player.DisplayName .. "\nName: " .. Player.Name,
-			Position = UDim2.fromOffset(8, 6),
-			RichText = true,
-			ZIndex = 53
-		})
-
-		
 		local LogoutBtn = Create("TextButton", Panel, {
 			Size = UDim2.new(1, -20, 0, 28),
-			Position = UDim2.new(0, 10, 0, 332),
+			Position = UDim2.new(0, 10, 1, -32),
 			BackgroundColor3 = Color3.fromRGB(200, 50, 50),
 			BackgroundTransparency = 0.1,
 			Font = Enum.Font.GothamBold,
@@ -19992,40 +20060,46 @@ function HzsLib:MakeWindow(Configs)
 		end)
 
 		
-		Panel.Size = UDim2.fromOffset(0, 0)
-		CreateTween({Panel, "Size", UDim2.fromOffset(320, 370), 0.25})
+		Panel.Size = UDim2.fromScale(0, 0)
+		CreateTween({Panel, "Size", UDim2.fromScale(1, 1), 0.25})
 	end
 
 	
-	local ProfileCard = Create("TextButton", Components, {
-		Name = "ProfileCard", Size = UDim2.new(0, HzsLib.Save.TabSize - 24, 0, 46),
+	ProfileCard = Create("TextButton", Components, {
+		Name = "ProfileCard", Size = UDim2.new(0, HzsLib.Save.TabSize - 24, 0, 58),
 		Position = UDim2.new(0, 12, 1, -9), AnchorPoint = Vector2.new(0, 1),
 		BackgroundColor3 = Theme["Color Hub 2"], BackgroundTransparency = 0.08,
 		Text = "", AutoButtonColor = false, ZIndex = 5
 	})
 	Make("Corner", ProfileCard, UDim.new(0, 12))
 	Create("UIStroke", ProfileCard, {Color = Theme["Color Stroke"], Thickness = 1})
-	local FooterAvatar = Create("ImageLabel", ProfileCard, {
+	FooterAvatar = Create("ImageButton", ProfileCard, {
 		Size = UDim2.fromOffset(32, 32), Position = UDim2.new(0, 7, 0.5, 0),
 		AnchorPoint = Vector2.new(0, 0.5), BackgroundTransparency = 1,
-		Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=100&h=100", ZIndex = 6
+		Image = "rbxthumb://type=AvatarHeadShot&id=" .. Player.UserId .. "&w=100&h=100", AutoButtonColor = false, ZIndex = 6
 	})
 	Make("Corner", FooterAvatar, UDim.new(0.5, 0))
 	Create("UIStroke", FooterAvatar, {Color = Theme["Color Theme"], Thickness = 1.5})
 	FooterName = Create("TextLabel", ProfileCard, {
-		Size = UDim2.new(1, -50, 0, 17), Position = UDim2.new(0, 45, 0, 6),
+		Size = UDim2.new(1, -50, 0, 15), Position = UDim2.new(0, 45, 0, 3),
 		BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 10,
 		TextColor3 = Theme["Color Text"], Text = ProfileData.DisplayName,
 		TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 6
 	})
 	FooterUser = Create("TextLabel", ProfileCard, {
-		Size = UDim2.new(1, -50, 0, 14), Position = UDim2.new(0, 45, 0, 23),
+		Size = UDim2.new(1, -50, 0, 14), Position = UDim2.new(0, 45, 0, 21),
 		BackgroundTransparency = 1, Font = Enum.Font.Gotham, TextSize = 9,
 		TextColor3 = Theme["Color Dark Text"], Text = ProfileData.Username,
 		TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 6
 	})
-	ProfileCard.Activated:Connect(OpenAccountPanel)
-	ProfileButton.Activated:Connect(OpenAccountPanel)
+	FooterStatus = Create("TextLabel", ProfileCard, {
+		Size = UDim2.new(1, -50, 0, 13), Position = UDim2.new(0, 45, 0, 40),
+		BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 8,
+		TextColor3 = ProfileData.Premium and Color3.fromRGB(255, 205, 65) or Theme["Color Dark Text"],
+		Text = ProfileData.Premium and "PREMIUM" or "BASIC",
+		TextXAlignment = Enum.TextXAlignment.Left, TextTruncate = Enum.TextTruncate.AtEnd, ZIndex = 6
+	})
+	FooterAvatar.Activated:Connect(OpenAccountPanel)
 
 	
 	
@@ -20133,6 +20207,12 @@ function HzsLib:MakeWindow(Configs)
 					ProfileData.Password = password
 					ProfileData.Premium = premium
 					ProfileData.Registered = true
+					if FooterName then FooterName.Text = ProfileData.DisplayName end
+					if FooterUser then FooterUser.Text = ProfileData.Username end
+					if FooterStatus then
+						FooterStatus.Text = premium and "PREMIUM" or "BASIC"
+						FooterStatus.TextColor3 = premium and Color3.fromRGB(255, 205, 65) or Theme["Color Dark Text"]
+					end
 				else
 					if username:lower() ~= tostring(ProfileData.Username):gsub("^@", ""):lower() or password ~= ProfileData.Password then
 						ErrLabel.Text = "Usuário ou senha incorretos."
@@ -20486,9 +20566,17 @@ function HzsLib:MakeWindow(Configs)
 	
 	
 	
-	function Window:MakeTab(paste, Configs)
+	local AutoFlagCounts = {}
+		function Window:MakeTab(paste, Configs)
 		if type(paste) == "table" then Configs = paste end
 		local TName = Configs[1] or Configs.Title or "Tab!"
+		local function ResolveAutoFlag(Flag, ComponentType, ComponentName)
+			if type(Flag) == "string" and Flag ~= "" then return Flag end
+			local base = "__HzsHubAuto:" .. tostring(TName) .. ":" .. tostring(ComponentType) .. ":" .. tostring(ComponentName)
+			local index = (AutoFlagCounts[base] or 0) + 1
+			AutoFlagCounts[base] = index
+			return base .. ":" .. tostring(index)
+		end
 		local TIcon = Configs[2] or Configs.Icon or ""
 		local TIconData = HzsLib:GetIcon(TIcon)
 		if type(TIconData) == "table" then
@@ -20785,7 +20873,7 @@ function HzsLib:MakeWindow(Configs)
 			local TName = Configs[1] or Configs.Name or Configs.Title or "Toggle"
 			local TDesc = Configs.Desc or Configs.Description or ""
 			local Callback = Funcs:GetCallback(Configs, 3)
-			local Flag = Configs[4] or Configs.Flag or false
+			local Flag = ResolveAutoFlag(Configs[4] or Configs.Flag, "Toggle", TName)
 			local Default = Configs[2] or Configs.Default or false
 			if CheckFlag(Flag) then Default = GetFlag(Flag) end
 			
@@ -20863,8 +20951,9 @@ function HzsLib:MakeWindow(Configs)
 			local CDesc = Configs.Desc or Configs.Description or ""
 			local DefaultColor = Configs.Default or Configs.Color or Color3.fromRGB(255, 100, 180)
 			local Callback = Funcs:GetCallback(Configs, 2)
-			local Flag = Configs.Flag or false
-			if CheckFlag(Flag) then
+			local Flag = ResolveAutoFlag(Configs.Flag, "ColorPicker", CName)
+			local HasSavedColor = CheckFlag(Flag)
+			if HasSavedColor then
 				local flagVal = GetFlag(Flag)
 				if type(flagVal) == "table" then
 					DefaultColor = Color3.fromRGB(flagVal[1], flagVal[2], flagVal[3])
@@ -20891,6 +20980,7 @@ function HzsLib:MakeWindow(Configs)
 			})
 
 			local CurrentColor = DefaultColor
+			if HasSavedColor then task.defer(function() Funcs:FireCallback(Callback, CurrentColor) end) end
 			local PickerOpen = false
 			local PickerFrame
 
@@ -21422,7 +21512,7 @@ function HzsLib:MakeWindow(Configs)
 			local DDesc = Configs.Desc or Configs.Description or ""
 			local DOptions = Configs[2] or Configs.Options or {}
 			local OpDefault = Configs[3] or Configs.Default or {}
-			local Flag = Configs[5] or Configs.Flag or false
+			local Flag = ResolveAutoFlag(Configs[5] or Configs.Flag, "Dropdown", DName)
 			local DMultiSelect = Configs.MultiSelect or false
 			local Callback = Funcs:GetCallback(Configs, 4)
 			
@@ -21826,7 +21916,7 @@ function HzsLib:MakeWindow(Configs)
 			local Max = Configs[3] or Configs.MaxValue or Configs.Max or 100
 			local Increase = Configs[4] or Configs.Increase or 1
 			local Callback = Funcs:GetCallback(Configs, 6)
-			local Flag = Configs[7] or Configs.Flag or false
+			local Flag = ResolveAutoFlag(Configs[7] or Configs.Flag, "Slider", SName)
 			local Default = Configs[5] or Configs.Default or 25
 			if CheckFlag(Flag) then Default = GetFlag(Flag) end
 			Min, Max = Min / Increase, Max / Increase
@@ -21957,6 +22047,8 @@ function HzsLib:MakeWindow(Configs)
 			local TPlaceholderText = Configs[5] or Configs.PlaceholderText or "Input"
 			local TClearText = Configs[3] or Configs.ClearText or false
 			local Callback = Funcs:GetCallback(Configs, 4)
+			local TextFlag = ResolveAutoFlag(Configs[6] or Configs.Flag, "TextBox", TName)
+			if CheckFlag(TextFlag) and type(GetFlag(TextFlag)) == "string" then TDefault = GetFlag(TextFlag) end
 			
 			if type(TDefault) ~= "string" or TDefault:gsub(" ", ""):len() < 1 then
 				TDefault = false
@@ -21981,7 +22073,7 @@ function HzsLib:MakeWindow(Configs)
 				TextColor3 = Theme["Color Text"],
 				ClearTextOnFocus = TClearText,
 				PlaceholderText = TPlaceholderText,
-				Text = ""
+				Text = type(TDefault) == "string" and TDefault or ""
 			}), "Text")
 			
 			local Pencil = Create("ImageLabel", SelectedFrame, {
@@ -22003,6 +22095,7 @@ function HzsLib:MakeWindow(Configs)
 			end
 			
 			TextBoxInput.FocusLost:Connect(Input)Input()
+			TextBoxInput.FocusLost:Connect(function() SetFlag(TextFlag, TextBoxInput.Text) end)
 			
 			TextBoxInput.FocusLost:Connect(function()
 				CreateTween({Pencil, "ImageColor3", Color3.fromRGB(255, 255, 255), 0.2})
