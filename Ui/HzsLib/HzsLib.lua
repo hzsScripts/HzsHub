@@ -19063,18 +19063,19 @@ local function ButtonFrame(Instance, Title, Description, HolderSize)
 end
 
 local function GetColor(Instance)
-	if Instance:IsA("Frame") then
-		return "BackgroundColor3"
-	elseif Instance:IsA("ImageLabel") then
-		return "ImageColor3"
-	elseif Instance:IsA("TextLabel") then
+	if not Instance then return nil end
+	if Instance:IsA("TextBox") or Instance:IsA("TextLabel") or Instance:IsA("TextButton") then
 		return "TextColor3"
+	elseif Instance:IsA("ImageLabel") or Instance:IsA("ImageButton") then
+		return "ImageColor3"
 	elseif Instance:IsA("ScrollingFrame") then
 		return "ScrollBarImageColor3"
 	elseif Instance:IsA("UIStroke") then
 		return "Color"
+	elseif Instance:IsA("Frame") then
+		return "BackgroundColor3"
 	end
-	return ""
+	return nil
 end
 
 
@@ -19186,27 +19187,28 @@ end
 
 function HzsLib:SetTheme(NewTheme)
 	if not VerifyTheme(NewTheme) then return end
-	
 	HzsLib.Save.Theme = NewTheme
 	SaveJson("redz library V5.json", HzsLib.Save)
 	Theme = HzsLib.Themes[NewTheme]
-	
 	Connection:FireConnection("ThemeChanged", NewTheme)
-	table.foreach(HzsLib.Instances, function(_,Val)
+	table.foreach(HzsLib.Instances, function(_, Val)
+		local instance = Val.Instance
+		if not instance then return end
 		if Val.Type == "Gradient" then
-			Val.Instance.Color = Theme["Color Hub 1"]
+			pcall(function() instance.Color = Theme["Color Hub 1"] end)
 		elseif Val.Type == "Frame" then
-			Val.Instance.BackgroundColor3 = Theme["Color Hub 2"]
-		elseif Val.Type == "Stroke" then
-			Val.Instance[GetColor(Val.Instance)] = Theme["Color Stroke"]
-		elseif Val.Type == "Theme" then
-			Val.Instance[GetColor(Val.Instance)] = Theme["Color Theme"]
-		elseif Val.Type == "Text" then
-			Val.Instance[GetColor(Val.Instance)] = Theme["Color Text"]
-		elseif Val.Type == "DarkText" then
-			Val.Instance[GetColor(Val.Instance)] = Theme["Color Dark Text"]
-		elseif Val.Type == "ScrollBar" then
-			Val.Instance[GetColor(Val.Instance)] = Theme["Color Theme"]
+			pcall(function() instance.BackgroundColor3 = Theme["Color Hub 2"] end)
+		elseif Val.Type == "Stroke" or Val.Type == "Theme" or Val.Type == "Text" or Val.Type == "DarkText" or Val.Type == "ScrollBar" then
+			local property = GetColor(instance)
+			local paletteKey = "Color Text"
+			if Val.Type == "Stroke" then
+				paletteKey = "Color Stroke"
+			elseif Val.Type == "Theme" or Val.Type == "ScrollBar" then
+				paletteKey = "Color Theme"
+			elseif Val.Type == "DarkText" then
+				paletteKey = "Color Dark Text"
+			end
+			if property then pcall(function() instance[property] = Theme[paletteKey] end) end
 		end
 	end)
 end
@@ -19680,22 +19682,17 @@ CloseButton:SetAttribute("Snd", "Close")
 			Create("TextLabel", Panel, {
 				Size = UDim2.new(1, -60, 0, 18), Position = UDim2.new(0, 12, 0, 2),
 				BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 12,
-				Text = "HzsHub  •  Perfil", TextColor3 = Theme["Color Text"],
+				Text = "HzsHub - Perfil", TextColor3 = Theme["Color Text"],
 				TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 52
 			})
-local PanelClose = Create("ImageButton", Panel, {
-			Size = UDim2.fromOffset(16, 16),
-			Position = UDim2.new(1, -10, 0, 10),
-			AnchorPoint = Vector2.new(1, 0),
-			BackgroundTransparency = 1,
-			Image = HzsLib:GetIcon("x"),
-			ImageColor3 = Theme["Color Text"],
-			ZIndex = 52,
-			AutoButtonColor = false
-		})
-		PanelClose.MouseEnter:Connect(function() CreateTween({PanelClose, "ImageColor3", Color3.fromRGB(255, 80, 80), 0.15}) end)
-		PanelClose.MouseLeave:Connect(function() CreateTween({PanelClose, "ImageColor3", Theme["Color Text"], 0.15}) end)
-		PanelClose.Activated:Connect(CloseAccountPanel)
+local PanelClose = Create("TextButton", Panel, {
+				Size = UDim2.fromOffset(52, 22), Position = UDim2.new(1, -10, 0, 8),
+				AnchorPoint = Vector2.new(1, 0), BackgroundColor3 = Theme["Color Stroke"],
+				TextColor3 = Theme["Color Text"], Text = "Fechar", Font = Enum.Font.GothamMedium,
+				TextSize = 9, ZIndex = 52, AutoButtonColor = true
+			})
+			Make("Corner", PanelClose, UDim.new(0, 7))
+			PanelClose.Activated:Connect(CloseAccountPanel)
 
 		
 		local AvatarFrame = Create("Frame", Panel, {
@@ -19722,16 +19719,6 @@ local PanelClose = Create("ImageButton", Panel, {
 
 		
 
-		local NameHidden = false
-		local function MaskedName(name, hidden)
-			if hidden then
-				local vis = math.min(3, #name)
-				return name:sub(1, vis) .. string.rep("•", math.max(0, #name - vis))
-			end
-			return name
-		end
-
-		
 		local DisplayRow = Create("Frame", Panel, {
 			Size = UDim2.new(1, -20, 0, 28),
 			Position = UDim2.new(0, 10, 0, 100),
@@ -19739,34 +19726,15 @@ local PanelClose = Create("ImageButton", Panel, {
 			ZIndex = 52
 		})
 		local DisplayLabel = Create("TextLabel", DisplayRow, {
-			Size = UDim2.new(1, -32, 1),
+			Size = UDim2.new(1, 0, 1),
 			BackgroundTransparency = 1,
 			Font = Enum.Font.GothamBold,
 			TextSize = 11,
 			TextColor3 = Theme["Color Text"],
 			TextXAlignment = "Left",
-			Text = MaskedName(ProfileData.DisplayName, false),
+			Text = ProfileData.DisplayName,
 			ZIndex = 52
 		})
-		local EyeBtn = Create("ImageButton", DisplayRow, {
-			Size = UDim2.fromOffset(18, 18),
-			Position = UDim2.new(1, 0, 0.5),
-			AnchorPoint = Vector2.new(1, 0.5),
-			BackgroundTransparency = 1,
-			Image = HzsLib:GetIcon("eye"),
-			ImageColor3 = Theme["Color Dark Text"],
-			ZIndex = 52,
-			AutoButtonColor = false
-		})
-		EyeBtn.Activated:Connect(function()
-			NameHidden = not NameHidden
-			EyeBtn.Image = NameHidden and HzsLib:GetIcon("eyeoff") or HzsLib:GetIcon("eye")
-			DisplayLabel.Text = MaskedName(ProfileData.DisplayName, NameHidden)
-						if FooterName then FooterName.Text = ProfileData.DisplayName end
-		end)
-
-		
-		local UsernameHidden = false
 		local UsernameRow = Create("Frame", Panel, {
 			Size = UDim2.new(1, -20, 0, 22),
 			Position = UDim2.new(0, 10, 0, 134),
@@ -19774,33 +19742,15 @@ local PanelClose = Create("ImageButton", Panel, {
 			ZIndex = 52
 		})
 		local UsernameLabel = Create("TextLabel", UsernameRow, {
-			Size = UDim2.new(1, -32, 1),
+			Size = UDim2.new(1, 0, 1),
 			BackgroundTransparency = 1,
 			Font = Enum.Font.Gotham,
 			TextSize = 10,
 			TextColor3 = Theme["Color Dark Text"],
 			TextXAlignment = "Left",
-			Text = MaskedName(ProfileData.Username, false),
+			Text = ProfileData.Username,
 			ZIndex = 52
 		})
-		local EyeBtn2 = Create("ImageButton", UsernameRow, {
-			Size = UDim2.fromOffset(16, 16),
-			Position = UDim2.new(1, 0, 0.5),
-			AnchorPoint = Vector2.new(1, 0.5),
-			BackgroundTransparency = 1,
-			Image = HzsLib:GetIcon("eye"),
-			ImageColor3 = Theme["Color Dark Text"],
-			ZIndex = 52,
-			AutoButtonColor = false
-		})
-		EyeBtn2.Activated:Connect(function()
-			UsernameHidden = not UsernameHidden
-			EyeBtn2.Image = UsernameHidden and HzsLib:GetIcon("eyeoff") or HzsLib:GetIcon("eye")
-			UsernameLabel.Text = MaskedName(ProfileData.Username, UsernameHidden)
-						if FooterUser then FooterUser.Text = ProfileData.Username end
-		end)
-
-		
 		local AccountTierLabel = Create("TextLabel", Panel, {
 			Size = UDim2.new(1, -20, 0, 15), Position = UDim2.new(0, 10, 0, 158),
 			BackgroundTransparency = 1, Font = Enum.Font.GothamBold, TextSize = 9,
@@ -19812,7 +19762,7 @@ local PanelClose = Create("ImageButton", Panel, {
 				Size = UDim2.new(1, -20, 0, 27), Position = UDim2.new(0, 10, 0, 178),
 				BackgroundColor3 = Theme["Color Stroke"], TextColor3 = Theme["Color Text"],
 				Font = Enum.Font.GothamMedium, TextSize = 10, TextXAlignment = Enum.TextXAlignment.Left,
-				Text = "  Tema: " .. tostring(HzsLib.Save.Theme) .. "    ▾", AutoButtonColor = true, ZIndex = 54
+				Text = "Tema: " .. tostring(HzsLib.Save.Theme), AutoButtonColor = true, ZIndex = 54
 			})
 			Make("Corner", ThemeDropdown, UDim.new(0, 8))
 			local ThemeMenu = Create("ScrollingFrame", Panel, {
@@ -19834,19 +19784,21 @@ local PanelClose = Create("ImageButton", Panel, {
 				local choice = Create("TextButton", ThemeMenu, {
 					Size = UDim2.new(1, -2, 0, 25), BackgroundColor3 = HzsLib.Themes[themeName]["Color Hub 2"],
 					TextColor3 = HzsLib.Themes[themeName]["Color Text"], Font = Enum.Font.GothamMedium,
-					TextSize = 10, Text = "  " .. themeName, TextXAlignment = Enum.TextXAlignment.Left,
+					TextSize = 10, Text = themeName, TextXAlignment = Enum.TextXAlignment.Left,
 					LayoutOrder = order, AutoButtonColor = true, ZIndex = 61
 				})
 				Make("Corner", choice, UDim.new(0, 6))
 				table.insert(ThemeChoices, choice)
 				choice.Activated:Connect(function()
 					HzsLib:SetTheme(themeName)
-					ThemeDropdown.Text = "  Tema: " .. themeName .. "    ▾"
+					ThemeDropdown.Text = "Tema: " .. themeName
 					ThemeMenu.Visible = false
 					Panel.BackgroundColor3 = Theme["Color Hub 2"]
 					AccountOverlay.BackgroundColor3 = Theme["Color Hub 2"]
 					ThemeDropdown.BackgroundColor3 = Theme["Color Stroke"]
 					ThemeDropdown.TextColor3 = Theme["Color Text"]
+					PanelClose.BackgroundColor3 = Theme["Color Stroke"]
+					PanelClose.TextColor3 = Theme["Color Text"]
 					ThemeMenu.BackgroundColor3 = Theme["Color Hub 2"]
 					for _, object in ipairs(Panel:GetDescendants()) do
 						if object:IsA("TextLabel") then
@@ -19863,7 +19815,7 @@ local PanelClose = Create("ImageButton", Panel, {
 						end
 					end
 					for _, option in ipairs(ThemeChoices) do
-						local optionName = option.Text:gsub("^%s+", "")
+						local optionName = option.Text
 						option.BackgroundColor3 = HzsLib.Themes[optionName]["Color Hub 2"]
 						option.TextColor3 = HzsLib.Themes[optionName]["Color Text"]
 					end
@@ -19875,113 +19827,62 @@ local PanelClose = Create("ImageButton", Panel, {
 			ThemeDropdown.Activated:Connect(function() ThemeMenu.Visible = not ThemeMenu.Visible end)
 
 
-		Create("Frame", Panel, {
-			Size = UDim2.new(1, -20, 0, 1),
-			Position = UDim2.new(0, 10, 0, 174),
-			BackgroundColor3 = Theme["Color Stroke"],
-			BackgroundTransparency = 0.5,
-			BorderSizePixel = 0,
-			ZIndex = 52
-		})
-
-		
-		local function MakeEditField(label, yPos, field)
-			local row = Create("Frame", Panel, {
-				Size = UDim2.new(1, -20, 0, 26),
-				Position = UDim2.new(0, 10, 0, yPos),
-				BackgroundColor3 = Theme["Color Stroke"],
-				BackgroundTransparency = 0.6,
-				ZIndex = 52
-			})
-			Make("Corner", row, UDim.new(0, 10))
-			Create("TextLabel", row, {
-				Size = UDim2.new(0, 60, 1),
-				BackgroundTransparency = 1,
-				Font = Enum.Font.GothamBold,
-				TextSize = 9,
-				TextColor3 = Theme["Color Dark Text"],
-				Text = label,
-				TextXAlignment = "Left",
-				Position = UDim2.new(0, 8),
-				ZIndex = 53
-			})
-			local tb = Create("TextBox", row, {
-				Size = UDim2.new(1, -70, 1),
-				Position = UDim2.new(0, 65),
-				BackgroundTransparency = 1,
-				Font = Enum.Font.GothamMedium,
-				TextSize = 10,
-				TextColor3 = Theme["Color Text"],
-				Text = field == "Username" and tostring(ProfileData[field] or ""):gsub("^@", "") or (ProfileData[field] or ""),
-				PlaceholderText = "...",
-				PlaceholderColor3 = Theme["Color Dark Text"],
-				TextXAlignment = "Left",
-				ClearTextOnFocus = false,
-				ZIndex = 53
-			})
-			tb.FocusLost:Connect(function()
-				if tb.Text ~= "" then
-					local editedValue = tb.Text
-					if field == "Username" then editedValue = "@" .. editedValue:gsub("^@", "") end
-					ProfileData[field] = editedValue
-					SaveProfile()
-					if field == "DisplayName" then
-						DisplayLabel.Text = MaskedName(ProfileData.DisplayName, NameHidden)
-						if FooterName then FooterName.Text = ProfileData.DisplayName end
-					elseif field == "Username" then
-						UsernameLabel.Text = MaskedName(ProfileData.Username, UsernameHidden)
-						if FooterUser then FooterUser.Text = ProfileData.Username end
+			local function MakeEditField(label, yPos, field)
+				local row = Create("Frame", Panel, {
+					Size = UDim2.new(1, -20, 0, 26),
+					Position = UDim2.new(0, 10, 0, yPos),
+					BackgroundColor3 = Theme["Color Stroke"],
+					BackgroundTransparency = 0.6,
+					ZIndex = 52
+				})
+				Make("Corner", row, UDim.new(0, 10))
+				Create("TextLabel", row, {
+					Size = UDim2.new(0, 60, 1),
+					BackgroundTransparency = 1,
+					Font = Enum.Font.GothamBold,
+					TextSize = 9,
+					TextColor3 = Theme["Color Dark Text"],
+					Text = label,
+					TextXAlignment = "Left",
+					Position = UDim2.new(0, 8),
+					ZIndex = 53
+				})
+				local tb = Create("TextBox", row, {
+					Size = UDim2.new(1, -70, 1),
+					Position = UDim2.new(0, 65),
+					BackgroundTransparency = 1,
+					Font = Enum.Font.GothamMedium,
+					TextSize = 10,
+					TextColor3 = Theme["Color Text"],
+					Text = field == "Username" and tostring(ProfileData[field] or ""):gsub("^@", "") or (ProfileData[field] or ""),
+					PlaceholderText = "...",
+					PlaceholderColor3 = Theme["Color Dark Text"],
+					TextXAlignment = "Left",
+					ClearTextOnFocus = false,
+					ZIndex = 53
+				})
+				tb.FocusLost:Connect(function()
+					if tb.Text ~= "" then
+						local editedValue = tb.Text
+						if field == "Username" then editedValue = "@" .. editedValue:gsub("^@", "") end
+						ProfileData[field] = editedValue
+						SaveProfile()
+						if field == "DisplayName" then
+							DisplayLabel.Text = ProfileData.DisplayName
+							if FooterName then FooterName.Text = ProfileData.DisplayName end
+						elseif field == "Username" then
+							UsernameLabel.Text = ProfileData.Username
+							if FooterUser then FooterUser.Text = ProfileData.Username end
+						end
 					end
-				end
-			end)
-			return row
-		end
+				end)
+				return row
+			end
+			MakeEditField("Nome:", 212, "DisplayName")
+			MakeEditField("Usuário:", 244, "Username")
 
-		MakeEditField("Nome:", 212, "DisplayName")
-		MakeEditField("Usuário:", 244, "Username")
-
-		
-		local PwRow = Create("Frame", Panel, {
-			Size = UDim2.new(1, -20, 0, 26),
-			Position = UDim2.new(0, 10, 0, 276),
-			BackgroundColor3 = Theme["Color Stroke"],
-			BackgroundTransparency = 0.6,
-			ZIndex = 52
-		})
-		Make("Corner", PwRow, UDim.new(0, 10))
-		Create("TextLabel", PwRow, {
-			Size = UDim2.new(0, 60, 1),
-			BackgroundTransparency = 1,
-			Font = Enum.Font.GothamBold,
-			TextSize = 9,
-			TextColor3 = Theme["Color Dark Text"],
-			Text = "Senha:",
-			TextXAlignment = "Left",
-			Position = UDim2.new(0, 8),
-			ZIndex = 53
-		})
-		local PwBox = Create("TextBox", PwRow, {
-			Size = UDim2.new(1, -70, 1),
-			Position = UDim2.new(0, 65),
-			BackgroundTransparency = 1,
-			Font = Enum.Font.GothamMedium,
-			TextSize = 10,
-			TextColor3 = Theme["Color Text"],
-			Text = ProfileData.Password or "",
-			PlaceholderText = "••••••",
-			PlaceholderColor3 = Theme["Color Dark Text"],
-			TextXAlignment = "Left",
-			ClearTextOnFocus = false,
-			ZIndex = 53
-		})
-		PwBox.FocusLost:Connect(function()
-			ProfileData.Password = PwBox.Text
-			SaveProfile()
-		end)
-
-		
-		local ProfileKeyRow = Create("Frame", Panel, {
-			Size = UDim2.new(1, -20, 0, 26), Position = UDim2.new(0, 10, 0, 308),
+			local ProfileKeyRow = Create("Frame", Panel, {
+			Size = UDim2.new(1, -20, 0, 26), Position = UDim2.new(0, 10, 0, 276),
 			BackgroundColor3 = Theme["Color Stroke"], BackgroundTransparency = 0.6, ZIndex = 52
 		})
 		Make("Corner", ProfileKeyRow, UDim.new(0, 9))
@@ -19994,7 +19895,7 @@ local PanelClose = Create("ImageButton", Panel, {
 			ClearTextOnFocus = false, ZIndex = 53
 		})
 		local ActivateKeyButton = Create("TextButton", Panel, {
-			Size = UDim2.new(1, -20, 0, 25), Position = UDim2.new(0, 10, 0, 340),
+			Size = UDim2.new(1, -20, 0, 25), Position = UDim2.new(0, 10, 0, 308),
 			BackgroundColor3 = ProfileData.Premium and Color3.fromRGB(45, 145, 90) or Theme["Color Theme"],
 			Font = Enum.Font.GothamBold, TextSize = 10, TextColor3 = Color3.new(1, 1, 1),
 			Text = ProfileData.Premium and "Premium ativo" or "Ativar key",
@@ -20034,21 +19935,12 @@ local PanelClose = Create("ImageButton", Panel, {
 			Font = Enum.Font.GothamBold,
 			TextSize = 11,
 			TextColor3 = Color3.fromRGB(255, 255, 255),
-			Text = "  Sair da conta",
+			Text = "Sair da conta",
 			TextXAlignment = "Left",
 			AutoButtonColor = false,
 			ZIndex = 52
 		})
 		Make("Corner", LogoutBtn, UDim.new(0, 10))
-		Create("ImageLabel", LogoutBtn, {
-			Size = UDim2.fromOffset(14, 14),
-			Position = UDim2.new(1, -14, 0.5),
-			AnchorPoint = Vector2.new(1, 0.5),
-			BackgroundTransparency = 1,
-			Image = HzsLib:GetIcon("logout"),
-			ImageColor3 = Color3.fromRGB(255, 255, 255),
-			ZIndex = 53
-		})
 		LogoutBtn.MouseEnter:Connect(function() CreateTween({LogoutBtn, "BackgroundTransparency", 0.3, 0.15}) end)
 		LogoutBtn.MouseLeave:Connect(function() CreateTween({LogoutBtn, "BackgroundTransparency", 0.1, 0.15}) end)
 		LogoutBtn.Activated:Connect(function()
