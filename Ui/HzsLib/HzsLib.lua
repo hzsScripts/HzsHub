@@ -3524,7 +3524,7 @@ function HzsLib:MakeWindow(Configs)
 			function Dropdown:Select(Option)
 				if type(Option) == "string" then
 					for _,Val in pairs(GetOptions()) do
-						if Val.Name == Option then Val.Active and Val.Active() end
+						if Val.Name == Option and Val.Active then Val.Active() end
 					end
 				end
 			end
