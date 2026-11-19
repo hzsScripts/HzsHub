@@ -25,8 +25,20 @@ local THEMES = {
     Ocean={rgb(104,160,232),rgb(96,198,206),rgb(38,52,76),rgb(36,60,70)},
     Crimson={rgb(226,112,122),rgb(232,160,106),rgb(72,40,48),rgb(74,50,44)},
     Emerald={rgb(98,196,148),rgb(124,198,220),rgb(36,62,54),rgb(36,58,66)},
-    Sakura={rgb(226,140,186),rgb(238,170,150),rgb(74,44,62),rgb(76,52,56)}}
-local THEME_ORDER = {"Violet","Ocean","Crimson","Emerald","Sakura"}
+    Sakura={rgb(226,140,186),rgb(238,170,150),rgb(74,44,62),rgb(76,52,56)},
+    Midnight={rgb(110,125,190),rgb(150,120,210),rgb(35,39,66),rgb(48,42,72)},
+    Rose={rgb(235,105,155),rgb(255,155,185),rgb(75,38,57),rgb(78,45,62)},
+    Sunset={rgb(245,145,85),rgb(235,95,115),rgb(78,48,43),rgb(78,43,53)},
+    Arctic={rgb(105,190,225),rgb(155,225,240),rgb(35,60,75),rgb(40,68,78)},
+    Monochrome={rgb(175,175,185),rgb(225,225,230),rgb(48,48,54),rgb(60,60,66)},
+    Gold={rgb(220,175,80),rgb(250,215,125),rgb(72,59,35),rgb(78,65,39)},
+    Neon={rgb(80,235,190),rgb(110,180,255),rgb(30,65,65),rgb(35,55,80)},
+    Mint={rgb(105,205,165),rgb(155,230,190),rgb(35,65,55),rgb(40,70,60)},
+    Cyberpunk={rgb(220,85,220),rgb(70,210,245),rgb(70,35,78),rgb(35,60,78)},
+    Lava={rgb(235,90,65),rgb(255,165,75),rgb(78,38,32),rgb(80,48,30)},
+    Coffee={rgb(175,130,95),rgb(220,180,135),rgb(65,48,39),rgb(75,56,43)},
+    Royal={rgb(115,105,220),rgb(195,145,235),rgb(45,40,85),rgb(62,45,88)}}
+local THEME_ORDER = {"Violet","Ocean","Crimson","Emerald","Sakura","Midnight","Rose","Sunset","Arctic","Monochrome","Gold","Neon","Mint","Cyberpunk","Lava","Coffee","Royal"}
 local themedObjects = setmetatable({}, {__mode="k"})
 local function themed(object,apply)
     themedObjects[object]=apply
@@ -1867,14 +1879,16 @@ end
 local function hexOf(color) return "#"..color:ToHex() end
 function Window:_buildOverlay()
     local player=Players.LocalPlayer
-    local overlay=shaded(self.Viewport,UDim2.fromOffset(204,0),C.card1,C.card2)
+    local overlay=shaded(self.Viewport,UDim2.fromOffset(164,0),C.card1,C.card2)
     overlay.AutomaticSize=Enum.AutomaticSize.Y;overlay.AnchorPoint=Vector2.new(0.5,0)
     overlay.Position=UDim2.new(0.5,0,0,0);overlay.Active=true;overlay.ZIndex=4
     overlay.BackgroundTransparency=0.05;overlay.Visible=self.Settings.Overlay~=false
-    round(overlay,12);glowBorder(overlay,0.5);pad(overlay,12,12,10,12);stack(overlay,6)
+    round(overlay,10);glowBorder(overlay,0.5);pad(overlay,8,8,7,8);stack(overlay,4)
     self.Overlay=overlay
     local head=frame(overlay,UDim2.new(1,0,0,18));head.BackgroundTransparency=1;head.LayoutOrder=1
-    local logo=image(head,self.LogoId,UDim2.fromOffset(16,16));logo.Position=UDim2.fromOffset(0,1)
+    local logoBadge=frame(head,UDim2.fromOffset(17,17),C.accentDim);logoBadge.Position=UDim2.fromOffset(0,0);round(logoBadge,5)
+    local logoLetter=text(logoBadge,"H",UDim2.fromScale(1,1));logoLetter.Font=F.bold;logoLetter.TextSize=12;logoLetter.TextColor3=C.white
+    themed(logoBadge,function() logoBadge.BackgroundColor3=C.accent end)
     local name=text(head,"Hzs-Hub",UDim2.new(1,-74,1,0));name.Position=UDim2.fromOffset(22,0)
     name.Font=F.bold;name.TextSize=12;name.TextColor3=C.white
     themedGradient(name,function() return C.text,C.accent end,0)
@@ -1898,13 +1912,6 @@ function Window:_buildOverlay()
     self:_connect(overlay:GetPropertyChangedSignal("AbsolutePosition"),placeReopen)
     self:_connect(self.Viewport:GetPropertyChangedSignal("AbsoluteSize"),placeReopen)
     task.defer(placeReopen)
-    overlay.InputBegan:Connect(function(input)
-        if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
-            local pos=overlay.AbsolutePosition-self.Viewport.AbsolutePosition
-            overlay.AnchorPoint=Vector2.zero;overlay.Position=UDim2.fromOffset(pos.X,pos.Y)
-            self.DragOverlay={Input=input,Start=input.Position,Origin=pos}
-        end
-    end)
     local lastKey
     local function rebuild(names)
         for _,child in ipairs(list:GetChildren()) do
@@ -2039,8 +2046,9 @@ function Library:CreateWindow(options)
     fallback.TextColor3=C.white;fallback.TextXAlignment=Enum.TextXAlignment.Center;accentFill(fallback,90)
     local logo=image(logoSlot,options.Logo or LOGO,UDim2.fromScale(1,1))
     logo.ZIndex=2
-    w:_connect(logo:GetPropertyChangedSignal("IsLoaded"),function() fallback.Visible=not logo.IsLoaded end)
-    fallback.Visible=not logo.IsLoaded
+    w:_connect(logo:GetPropertyChangedSignal("IsLoaded"),function() fallback.Visible=true end)
+    fallback.Visible=true
+    fallback.ZIndex=3
     local brand=text(side,"Hzs-Hub",UDim2.fromOffset(122,20))
     brand.Position=UDim2.fromOffset(66,18);brand.TextSize=16;brand.Font=F.bold;brand.TextColor3=C.white
     themedGradient(brand,function() return C.text,C.accent end,0)
@@ -2184,7 +2192,9 @@ function Library:CreateWindow(options)
     w.Reopen=button(w.Viewport,"",UDim2.fromOffset(150,38))
     w.Reopen.AnchorPoint=Vector2.new(0.5,0);w.Reopen.Position=UDim2.new(0.5,0,0,8);w.Reopen.BackgroundColor3=C.white;w.Reopen.Visible=false
     gradient(w.Reopen,C.side1,C.side2,90);round(w.Reopen,11);accentStroke(w.Reopen,0.5)
-    local reopenLogo=image(w.Reopen,options.Logo or LOGO,UDim2.fromOffset(22,22));reopenLogo.Position=UDim2.fromOffset(10,8)
+    local reopenBadge=frame(w.Reopen,UDim2.fromOffset(23,23),C.accent);reopenBadge.Position=UDim2.fromOffset(9,7);round(reopenBadge,7)
+    local reopenLetter=text(reopenBadge,"H",UDim2.fromScale(1,1));reopenLetter.Font=F.bold;reopenLetter.TextSize=16;reopenLetter.TextColor3=C.white
+    themed(reopenBadge,function() reopenBadge.BackgroundColor3=C.accent end)
     local reopenText=text(w.Reopen,"Hzs-Hub",UDim2.new(1,-46,1,0));reopenText.Position=UDim2.fromOffset(39,0)
     reopenText.Font=F.bold;reopenText.TextColor3=C.white;themedGradient(reopenText,function() return C.text,C.accent end,0)
     close.Activated:Connect(function()
@@ -2222,16 +2232,6 @@ function Library:CreateWindow(options)
     end)
     w:_connect(UIS.InputChanged,function(input)
         if input.UserInputType==Enum.UserInputType.MouseMovement then w:_placeTip() end
-        local od=w.DragOverlay
-        if od then
-            local touch=od.Input.UserInputType==Enum.UserInputType.Touch
-            if (touch and input==od.Input) or (not touch and input.UserInputType==Enum.UserInputType.MouseMovement) then
-                local d=input.Position-od.Start
-                local bounds,size=w.Viewport.AbsoluteSize,w.Overlay.AbsoluteSize
-                w.Overlay.Position=UDim2.fromOffset(math.clamp(od.Origin.X+d.X,0,math.max(0,bounds.X-size.X)),
-                    math.clamp(od.Origin.Y+d.Y,0,math.max(0,bounds.Y-size.Y)))
-            end
-        end
         local slider=w.DragSlider
         if slider and w.Visible then
             local touch=slider.Input.UserInputType==Enum.UserInputType.Touch
@@ -2250,7 +2250,6 @@ function Library:CreateWindow(options)
     w:_connect(UIS.InputEnded,function(input)
         if w.DragSlider and input==w.DragSlider.Input then w.DragSlider=nil end
         if w.DragWindow and input==w.DragWindow.Input then w.DragWindow=nil end
-        if w.DragOverlay and input==w.DragOverlay.Input then w.DragOverlay=nil end
     end)
     w.Gui.Destroying:Connect(function() w:_teardown() end)
     w:SetToggleKey("RightShift");w:_fit()
@@ -2312,7 +2311,7 @@ function Library:CreateWindow(options)
         Tooltip="Hints like this one when you hover a setting.",
         Callback=function(v) w.Settings.Tooltips=v;w:_applyTooltips();w:_scheduleSave() end})
     controls.Overlay=appearance:CreateToggle({Name="Overlay",CurrentValue=true,
-        Tooltip="Small panel with FPS, ping and active features. Drag it anywhere.",
+        Tooltip="Compact, fixed panel with FPS, ping and active features.",
         Callback=function(v) w.Settings.Overlay=v;if w.Overlay then w.Overlay.Visible=v end;w:_scheduleSave() end})
     appearance:CreateButton({Name="Reset UI settings",Icon="rotate-ccw",Tooltip="Everything on this tab goes back to default.",Callback=function()
         w:Confirm({Title="Reset UI settings?",Content="All appearance options on this tab go back to default. Your feature settings and configs stay.",
