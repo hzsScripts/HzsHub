@@ -1879,36 +1879,44 @@ end
 local function hexOf(color) return "#"..color:ToHex() end
 function Window:_buildOverlay()
     local player=Players.LocalPlayer
-    local overlay=shaded(self.Viewport,UDim2.fromOffset(286,30),C.card1,C.card2)
+
+    -- Thin horizontal status bar. It deliberately contains no active-feature list.
+    local overlay=shaded(self.Viewport,UDim2.fromOffset(252,22),C.card1,C.card2)
+    overlay.Name="HzsHubFPSBar"
     overlay.AnchorPoint=Vector2.new(0.5,0)
-    overlay.Position=UDim2.new(0.5,0,0,8)
-    overlay.Active=false;overlay.ZIndex=4
-    overlay.BackgroundTransparency=0.04
+    overlay.Position=UDim2.new(0.5,0,0,5)
+    overlay.Active=false
+    overlay.ZIndex=4
+    overlay.BackgroundTransparency=0.06
+    overlay.ClipsDescendants=true
     overlay.Visible=self.Settings.Overlay~=false
-    round(overlay,8);glowBorder(overlay,0.58)
+    round(overlay,6)
+    glowBorder(overlay,0.68)
     self.Overlay=overlay
 
-    -- Slim, single-line FPS bar: no active-feature list or status labels.
-    local logo=text(overlay,"H",UDim2.fromOffset(15,30))
-    logo.Position=UDim2.fromOffset(8,0)
-    logo.Font=F.bold;logo.TextSize=17;logo.TextColor3=rgb(255,105,180)
-    logo.TextXAlignment=Enum.TextXAlignment.Center
-
-    local name=text(overlay,"Hzs-Hub",UDim2.fromOffset(54,30))
-    name.Position=UDim2.fromOffset(25,0)
-    name.Font=F.bold;name.TextSize=10;name.TextColor3=C.white
+    local name=text(overlay,"Hzs-Hub",UDim2.fromOffset(57,22))
+    name.Position=UDim2.fromOffset(8,0)
+    name.Font=F.bold
+    name.TextSize=9
+    name.TextColor3=C.white
+    name.TextYAlignment=Enum.TextYAlignment.Center
     themedGradient(name,function() return C.text,C.accent end,0)
 
-    local stats=text(overlay,"",UDim2.new(1,-144,1,0))
-    stats.Position=UDim2.fromOffset(82,0)
-    stats.TextSize=10;stats.TextColor3=C.sub;stats.RichText=true
+    local stats=text(overlay,"",UDim2.new(1,-116,1,0))
+    stats.Position=UDim2.fromOffset(68,0)
+    stats.TextSize=9
+    stats.TextColor3=C.sub
+    stats.RichText=true
     stats.TextXAlignment=Enum.TextXAlignment.Center
+    stats.TextYAlignment=Enum.TextYAlignment.Center
 
-    local clock=text(overlay,"",UDim2.fromOffset(42,30))
+    local clock=text(overlay,"",UDim2.fromOffset(38,22))
     clock.AnchorPoint=Vector2.new(1,0)
-    clock.Position=UDim2.new(1,-8,0,0)
+    clock.Position=UDim2.new(1,-7,0,0)
     clock.TextXAlignment=Enum.TextXAlignment.Right
-    clock.TextSize=10;clock.TextColor3=C.muted
+    clock.TextYAlignment=Enum.TextYAlignment.Center
+    clock.TextSize=9
+    clock.TextColor3=C.muted
 
     local function placeReopen()
         local reopen=self.Reopen
@@ -1916,7 +1924,10 @@ function Window:_buildOverlay()
         local overlayPos=overlay.AbsolutePosition-self.Viewport.AbsolutePosition
         local overlaySize=overlay.AbsoluteSize
         reopen.AnchorPoint=Vector2.new(0.5,0)
-        reopen.Position=UDim2.fromOffset(overlayPos.X+overlaySize.X/2,overlayPos.Y+overlaySize.Y+5)
+        reopen.Position=UDim2.fromOffset(
+            overlayPos.X+overlaySize.X/2,
+            overlayPos.Y+overlaySize.Y+3
+        )
     end
     self:_connect(overlay:GetPropertyChangedSignal("AbsoluteSize"),placeReopen)
     self:_connect(overlay:GetPropertyChangedSignal("AbsolutePosition"),placeReopen)
@@ -1936,17 +1947,27 @@ function Window:_buildOverlay()
             pingValue=tostring(math.floor(ping+0.5))
             pingColor=ping<80 and good or ping<160 and okay or bad
         end
-        stats.Text=string.format('<font color="%s">%d FPS</font>  <font color="%s">·</font>  <font color="%s">%s ms</font>',
-            fpsColor,math.floor(fps+0.5),hexOf(C.dim),pingColor,pingValue)
+        stats.Text=string.format(
+            '<font color="%s">%d FPS</font>  <font color="%s">·</font>  <font color="%s">%s ms</font>',
+            fpsColor,math.floor(fps+0.5),hexOf(C.dim),pingColor,pingValue
+        )
     end
 
     local frames,fpsClock,fps,elapsed=0,os.clock(),60,1
     self:_connect(RunService.RenderStepped,function(dt)
         frames=frames+1
         local now=os.clock()
-        if now-fpsClock>=0.5 then fps=frames/(now-fpsClock);frames=0;fpsClock=now;self.FPS=fps end
+        if now-fpsClock>=0.5 then
+            fps=frames/(now-fpsClock)
+            frames=0
+            fpsClock=now
+            self.FPS=fps
+        end
         elapsed=elapsed+dt
-        if elapsed>=0.5 then elapsed=0;update(fps) end
+        if elapsed>=0.5 then
+            elapsed=0
+            update(fps)
+        end
     end)
 end
 local function guiParent(requested,playerGui)
@@ -2175,14 +2196,27 @@ function Library:CreateWindow(options)
     pad(keycap,6,6,0,0)
     w.Hint=text(keycap,"",UDim2.fromScale(0,1));w.Hint.AutomaticSize=Enum.AutomaticSize.X
     w.Hint.TextSize=11;w.Hint.Font=F.bold;w.Hint.TextColor3=C.sub
-    w.Reopen=button(w.Viewport,"H",UDim2.fromOffset(34,30))
-    w.Reopen.AnchorPoint=Vector2.new(0.5,0);w.Reopen.Position=UDim2.new(0.5,0,0,8)
-    w.Reopen.BackgroundTransparency=1;w.Reopen.Visible=false;w.Reopen.AutoButtonColor=false
-    w.Reopen.Text="H";w.Reopen.Font=F.bold;w.Reopen.TextSize=23
-    w.Reopen.TextColor3=rgb(255,105,180);w.Reopen.TextStrokeTransparency=1
-    for _,child in ipairs(w.Reopen:GetChildren()) do
-        if child:IsA("UICorner") or child:IsA("UIStroke") or child:IsA("UIGradient") then child:Destroy() end
-    end
+    -- Borderless reopen control: only a pink H, no image, circle, badge or pill.
+    w.Reopen=new("TextButton",{
+        Name="HzsHubReopenButton",
+        Text="H",
+        Size=UDim2.fromOffset(24,24),
+        BackgroundTransparency=1,
+        BackgroundColor3=C.white,
+        BorderSizePixel=0,
+        TextColor3=rgb(255,105,180),
+        TextSize=21,
+        Font=F.bold,
+        TextXAlignment=Enum.TextXAlignment.Center,
+        TextYAlignment=Enum.TextYAlignment.Center,
+        TextStrokeTransparency=1,
+        AutoButtonColor=false,
+        Selectable=false,
+        ZIndex=5,
+    },w.Viewport)
+    w.Reopen.AnchorPoint=Vector2.new(0.5,0)
+    w.Reopen.Position=UDim2.new(0.5,0,0,30)
+    w.Reopen.Visible=false
     close.Activated:Connect(function()
         w:_click()
         w:Confirm({Title="Close Hzs-Hub?",ConfirmText="Close",Danger=true,
@@ -2297,7 +2331,7 @@ function Library:CreateWindow(options)
         Tooltip="Hints like this one when you hover a setting.",
         Callback=function(v) w.Settings.Tooltips=v;w:_applyTooltips();w:_scheduleSave() end})
     controls.Overlay=appearance:CreateToggle({Name="Overlay",CurrentValue=true,
-        Tooltip="Thin horizontal bar showing FPS, ping and the clock.",
+        Tooltip="Thin horizontal bar with FPS, ping and the clock.",
         Callback=function(v) w.Settings.Overlay=v;if w.Overlay then w.Overlay.Visible=v end;w:_scheduleSave() end})
     appearance:CreateButton({Name="Reset UI settings",Icon="rotate-ccw",Tooltip="Everything on this tab goes back to default.",Callback=function()
         w:Confirm({Title="Reset UI settings?",Content="All appearance options on this tab go back to default. Your feature settings and configs stay.",
