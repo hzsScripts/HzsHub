@@ -37,8 +37,17 @@ local THEMES = {
     Cyberpunk={rgb(220,85,220),rgb(70,210,245),rgb(70,35,78),rgb(35,60,78)},
     Lava={rgb(235,90,65),rgb(255,165,75),rgb(78,38,32),rgb(80,48,30)},
     Coffee={rgb(175,130,95),rgb(220,180,135),rgb(65,48,39),rgb(75,56,43)},
-    Royal={rgb(115,105,220),rgb(195,145,235),rgb(45,40,85),rgb(62,45,88)}}
-local THEME_ORDER = {"Violet","Ocean","Crimson","Emerald","Sakura","Midnight","Rose","Sunset","Arctic","Monochrome","Gold","Neon","Mint","Cyberpunk","Lava","Coffee","Royal"}
+    Royal={rgb(115,105,220),rgb(195,145,235),rgb(45,40,85),rgb(62,45,88)},
+    Pink={rgb(255,105,180),rgb(255,160,210),rgb(78,38,65),rgb(84,43,73)},
+    Aqua={rgb(40,205,205),rgb(105,225,235),rgb(30,66,72),rgb(36,76,82)},
+    Graphite={rgb(145,155,170),rgb(195,202,214),rgb(43,48,58),rgb(53,58,68)},
+    Lavender={rgb(165,135,235),rgb(205,175,255),rgb(55,43,82),rgb(68,51,92)},
+    Cherry={rgb(205,55,105),rgb(245,105,145),rgb(72,31,48),rgb(82,38,57)},
+    Cobalt={rgb(65,125,235),rgb(105,175,255),rgb(32,48,82),rgb(35,58,95)},
+    Coral={rgb(245,125,115),rgb(255,180,145),rgb(78,43,47),rgb(88,53,52)},
+    Lime={rgb(160,210,75),rgb(205,235,115),rgb(48,66,35),rgb(60,78,40)},
+    Ice={rgb(150,205,245),rgb(205,235,255),rgb(40,58,78),rgb(48,70,88)}}
+local THEME_ORDER = {"Violet","Ocean","Crimson","Emerald","Sakura","Midnight","Rose","Sunset","Arctic","Monochrome","Gold","Neon","Mint","Cyberpunk","Lava","Coffee","Royal","Pink","Aqua","Graphite","Lavender","Cherry","Cobalt","Coral","Lime","Ice"}
 local themedObjects = setmetatable({}, {__mode="k"})
 local function themed(object,apply)
     themedObjects[object]=apply
@@ -870,7 +879,7 @@ function Window:ApplySettings(settings)
     if type(settings.ClickSounds)=="boolean" then self.Settings.ClickSounds=settings.ClickSounds end
     if type(settings.Animations)=="boolean" then self.Settings.Animations=settings.Animations end
     if type(settings.Volume)=="number" then self.Settings.Volume=math.clamp(settings.Volume,0,1) end
-    if type(settings.Scale)=="number" then self.Settings.Scale=math.clamp(settings.Scale,0.65,1.25) end
+    if type(settings.Scale)=="number" then self.Settings.Scale=math.clamp(settings.Scale,0.65,0.95) end
     if type(settings.Theme)=="string" and THEMES[settings.Theme] then self:_setTheme(settings.Theme) end
     for _,key in ipairs({"Blur","Tooltips","Notifications","Streamer","OpenOnLaunch"}) do
         if type(settings[key])=="boolean" then self.Settings[key]=settings[key] end
@@ -2003,7 +2012,7 @@ function Library:CreateWindow(options)
         ConfigEnabled=HAS_FILES and options.SaveConfig~=false,
         ConfigFolder=tostring(options.ConfigFolder or "Hzs-Hub"),
         TabIcon=options.TabIcon or "layout-grid",
-        Settings={ToggleKey="RightShift",ClickSounds=true,Volume=0.45,Animations=true,Scale=1,Theme="Violet",Overlay=true,
+        Settings={ToggleKey="RightShift",ClickSounds=true,Volume=0.45,Animations=true,Scale=0.88,Theme="Violet",Overlay=true,
             Blur=false,Tooltips=true,Notifications=true,NotifyDuration=3.5,Streamer=false,OpenOnLaunch=true}},Window)
     w.LogoId=options.Logo or LOGO
     w:_loadConfig()
@@ -2046,21 +2055,12 @@ function Library:CreateWindow(options)
     local side=shaded(body,UDim2.new(0,196,1,0),C.side1,C.side2);round(side,12)
     local seam=shaded(body,UDim2.new(0,14,1,0),C.side1,C.side2);seam.Position=UDim2.fromOffset(182,0)
     local divider=frame(body,UDim2.new(0,1,1,0),C.line);divider.Position=UDim2.fromOffset(196,0)
-    local logoSlot=frame(side,UDim2.fromOffset(40,40),C.white)
-    themedGradient(logoSlot,function() return C.accentDim,C.pinkDim end,135)
-    logoSlot.Position=UDim2.fromOffset(16,17);round(logoSlot,11);accentStroke(logoSlot,0.55)
-    local fallback=text(logoSlot,"H",UDim2.fromScale(1,1));fallback.TextSize=20;fallback.Font=F.bold
-    fallback.TextColor3=C.white;fallback.TextXAlignment=Enum.TextXAlignment.Center;accentFill(fallback,90)
-    local logo=image(logoSlot,options.Logo or LOGO,UDim2.fromScale(1,1))
-    logo.ZIndex=2
-    w:_connect(logo:GetPropertyChangedSignal("IsLoaded"),function() fallback.Visible=true end)
-    fallback.Visible=true
-    fallback.ZIndex=3
-    local brand=text(side,"Hzs-Hub",UDim2.fromOffset(122,20))
-    brand.Position=UDim2.fromOffset(66,18);brand.TextSize=16;brand.Font=F.bold;brand.TextColor3=C.white
+    -- Clean sidebar header: no logo tile, H mark, image, badge or circular icon.
+    local brand=text(side,"Hzs-Hub",UDim2.fromOffset(164,22))
+    brand.Position=UDim2.fromOffset(16,23);brand.TextSize=16;brand.Font=F.bold;brand.TextColor3=C.white
     themedGradient(brand,function() return C.text,C.accent end,0)
-    local subtitle=text(side,"workspace",UDim2.fromOffset(122,16))
-    subtitle.Position=UDim2.fromOffset(66,38);subtitle.TextSize=11;subtitle.TextColor3=C.muted
+    local subtitle=text(side,"workspace",UDim2.fromOffset(164,16))
+    subtitle.Position=UDim2.fromOffset(16,44);subtitle.TextSize=11;subtitle.TextColor3=C.muted
     local sideRule=frame(side,UDim2.fromOffset(164,1),C.white);sideRule.Position=UDim2.fromOffset(16,71)
     themedGradient(sideRule,function() return C.accent,C.line end,0,0.6,0.45)
     w.Nav=new("ScrollingFrame",{Position=UDim2.fromOffset(10,83),Size=UDim2.new(1,-20,1,-149),
@@ -2196,16 +2196,16 @@ function Library:CreateWindow(options)
     pad(keycap,6,6,0,0)
     w.Hint=text(keycap,"",UDim2.fromScale(0,1));w.Hint.AutomaticSize=Enum.AutomaticSize.X
     w.Hint.TextSize=11;w.Hint.Font=F.bold;w.Hint.TextColor3=C.sub
-    -- Borderless reopen control: only a pink H, no image, circle, badge or pill.
+    -- Reopen control is text-only: no H glyph, image, circle or icon.
     w.Reopen=new("TextButton",{
         Name="HzsHubReopenButton",
-        Text="H",
-        Size=UDim2.fromOffset(22,22),
+        Text="Hzs-Hub",
+        Size=UDim2.fromOffset(76,20),
         BackgroundTransparency=1,
         BackgroundColor3=C.white,
         BorderSizePixel=0,
-        TextColor3=rgb(255,105,180),
-        TextSize=19,
+        TextColor3=C.accent,
+        TextSize=10,
         Font=F.bold,
         TextXAlignment=Enum.TextXAlignment.Center,
         TextYAlignment=Enum.TextYAlignment.Center,
@@ -2214,6 +2214,7 @@ function Library:CreateWindow(options)
         Selectable=false,
         ZIndex=5,
     },w.Viewport)
+    themed(w.Reopen,function() w.Reopen.TextColor3=C.accent end)
     w.Reopen.AnchorPoint=Vector2.new(0.5,0)
     w.Reopen.Position=UDim2.new(0.5,0,0,30)
     w.Reopen.Visible=false
@@ -2285,7 +2286,7 @@ function Library:CreateWindow(options)
     end)
     local controls={}
     w.SettingsControls=controls
-    local DEFAULTS={ToggleKey="RightShift",ClickSounds=true,Volume=0.45,Animations=true,Scale=1,Theme="Violet",Overlay=true,
+    local DEFAULTS={ToggleKey="RightShift",ClickSounds=true,Volume=0.45,Animations=true,Scale=0.88,Theme="Violet",Overlay=true,
         Blur=false,Tooltips=true,Notifications=true,NotifyDuration=3.5,Streamer=false,OpenOnLaunch=true}
     local input=settings:CreateSection({Name="Controls",Column="Left",Icon="keyboard"})
     w.KeyControl=input:CreateKeybind({Name="Toggle menu",CurrentKeybind="RightShift",
@@ -2320,7 +2321,7 @@ function Library:CreateWindow(options)
     controls.Theme=appearance:CreateDropdown({Name="Theme",Options=themeOptions,CurrentOption="Violet",
         Tooltip="Accent colors for the whole menu.",
         Callback=function(v) w:_setTheme(v);w:_scheduleSave() end})
-    controls.Scale=appearance:CreateSlider({Name="UI scale",Range={0.65,1.25},Increment=0.05,CurrentValue=1,
+    controls.Scale=appearance:CreateSlider({Name="UI scale",Range={0.65,0.95},Increment=0.05,CurrentValue=0.88,
         Tooltip="Makes the whole menu bigger or smaller.",Callback=function(v) w.Settings.Scale=v;w:_fit() end})
     controls.Animations=appearance:CreateToggle({Name="Smooth transitions",CurrentValue=true,
         Tooltip="Turn off for instant, animation-free UI.",Callback=function(v) w.Settings.Animations=v end})
