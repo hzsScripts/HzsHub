@@ -292,10 +292,15 @@ local function accentFill(parent,rotation)
 end
 local function border(x,transparency) return new("UIStroke",{Color=C.line,Transparency=transparency or 0.35,ApplyStrokeMode=Enum.ApplyStrokeMode.Border},x) end
 local function glowBorder(x,strength)
-    local s=new("UIStroke",{Color=C.white,Transparency=0,ApplyStrokeMode=Enum.ApplyStrokeMode.Border},x)
+    local s=new("UIStroke",{Color=C.white,Transparency=0,Thickness=1.15,ApplyStrokeMode=Enum.ApplyStrokeMode.Border},x)
     strength=strength or 0.6
+    -- Keep the border translucent, but avoid the near-invisible 65-72% alpha fade.
+    local startTransparency=math.clamp(0.18+strength*0.18,0.22,0.38)
+    local middleTransparency=math.min(startTransparency+0.10,0.50)
+    local endTransparency=math.min(startTransparency+0.20,0.60)
     local g=new("UIGradient",{Rotation=125,
-        Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,strength),NumberSequenceKeypoint.new(0.4,0.66),NumberSequenceKeypoint.new(1,0.72)})},s)
+        Transparency=NumberSequence.new({NumberSequenceKeypoint.new(0,startTransparency),
+            NumberSequenceKeypoint.new(0.4,middleTransparency),NumberSequenceKeypoint.new(1,endTransparency)})},s)
     themed(g,function()
         g.Color=ColorSequence.new({ColorSequenceKeypoint.new(0,C.accent),ColorSequenceKeypoint.new(0.4,C.line),ColorSequenceKeypoint.new(1,C.line)})
     end)
@@ -879,7 +884,7 @@ function Window:ApplySettings(settings)
     if type(settings.ClickSounds)=="boolean" then self.Settings.ClickSounds=settings.ClickSounds end
     if type(settings.Animations)=="boolean" then self.Settings.Animations=settings.Animations end
     if type(settings.Volume)=="number" then self.Settings.Volume=math.clamp(settings.Volume,0,1) end
-    if type(settings.Scale)=="number" then self.Settings.Scale=math.clamp(settings.Scale,0.65,0.95) end
+    if type(settings.Scale)=="number" then self.Settings.Scale=math.clamp(settings.Scale,0.45,0.95) end
     if type(settings.Theme)=="string" and THEMES[settings.Theme] then self:_setTheme(settings.Theme) end
     for _,key in ipairs({"Blur","Tooltips","Notifications","Streamer","OpenOnLaunch"}) do
         if type(settings[key])=="boolean" then self.Settings[key]=settings[key] end
@@ -2031,7 +2036,7 @@ function Library:CreateWindow(options)
         ConfigEnabled=HAS_FILES and options.SaveConfig~=false,
         ConfigFolder=tostring(options.ConfigFolder or "Hzs-Hub"),
         TabIcon=options.TabIcon or "layout-grid",
-        Settings={ToggleKey="RightShift",ClickSounds=true,Volume=0.45,Animations=true,Scale=0.88,Theme="Violet",Overlay=true,
+        Settings={ToggleKey="RightShift",ClickSounds=true,Volume=0.45,Animations=true,Scale=0.78,Theme="Violet",Overlay=true,
             Blur=false,Tooltips=true,Notifications=true,NotifyDuration=3.5,Streamer=false,OpenOnLaunch=true}},Window)
     w.LogoId=options.Logo or LOGO
     w:_loadConfig()
@@ -2208,13 +2213,40 @@ function Library:CreateWindow(options)
     w.StatusDot.Position=UDim2.fromOffset(219,533);round(w.StatusDot,"full");accentFill(w.StatusDot,45)
     w.Status=text(body,"Ready",UDim2.new(0.5,-30,0,24))
     w.Status.Position=UDim2.fromOffset(230,521);w.Status.TextSize=11;w.Status.TextColor3=C.muted
-    local toggleHint=text(body,"to toggle",UDim2.fromOffset(52,24));toggleHint.Position=UDim2.new(1,-66,0,521)
+    local toggleHint=text(body,"to toggle",UDim2.fromOffset(52,24));toggleHint.Position=UDim2.new(1,-89,0,521)
     toggleHint.TextXAlignment=Enum.TextXAlignment.Right;toggleHint.TextSize=11;toggleHint.TextColor3=C.dim
     local keycap=frame(body,UDim2.fromOffset(0,18),C.row);keycap.AnchorPoint=Vector2.new(1,0)
-    keycap.Position=UDim2.new(1,-71,0,524);keycap.AutomaticSize=Enum.AutomaticSize.X;round(keycap,5);border(keycap,0.2)
+    keycap.Position=UDim2.new(1,-96,0,524);keycap.AutomaticSize=Enum.AutomaticSize.X;round(keycap,5);border(keycap,0.2)
     pad(keycap,6,6,0,0)
     w.Hint=text(keycap,"",UDim2.fromScale(0,1));w.Hint.AutomaticSize=Enum.AutomaticSize.X
     w.Hint.TextSize=11;w.Hint.Font=F.bold;w.Hint.TextColor3=C.sub
+
+    -- Drag this corner to resize the whole menu proportionally.
+    local resizeHandle=button(body,"",UDim2.fromOffset(22,22))
+    resizeHandle.Name="HzsHubResizeHandle"
+    resizeHandle.AnchorPoint=Vector2.new(1,1)
+    resizeHandle.Position=UDim2.new(1,-5,1,-5)
+    resizeHandle.BackgroundTransparency=1
+    resizeHandle.ZIndex=20
+    resizeHandle.Active=true
+    resizeHandle.Selectable=false
+    local resizeGlyph=icon(resizeHandle,"move-diagonal",12,C.muted)
+    resizeGlyph.AnchorPoint=Vector2.new(0.5,0.5)
+    resizeGlyph.Position=UDim2.fromScale(0.5,0.5)
+    resizeGlyph.ZIndex=21
+    resizeHandle.MouseEnter:Connect(function()
+        TweenService:Create(resizeGlyph,TweenInfo.new(0.12),{ImageColor3=C.accent}):Play()
+    end)
+    resizeHandle.MouseLeave:Connect(function()
+        TweenService:Create(resizeGlyph,TweenInfo.new(0.12),{ImageColor3=C.muted}):Play()
+    end)
+    resizeHandle.InputBegan:Connect(function(input)
+        if input.UserInputType==Enum.UserInputType.MouseButton1 or input.UserInputType==Enum.UserInputType.Touch then
+            w:_click()
+            w.ResizeWindow={Input=input,Start=input.Position,Scale=w.Scale.Scale}
+        end
+    end)
+
     -- Reopen button mirrors the FPS bar, in a smaller card with the same H badge.
     w.Reopen=new("TextButton",{
         Name="HzsHubReopenButton",
@@ -2310,6 +2342,31 @@ function Library:CreateWindow(options)
             local touch=slider.Input.UserInputType==Enum.UserInputType.Touch
             if (touch and input==slider.Input) or (not touch and input.UserInputType==Enum.UserInputType.MouseMovement) then slider.Update(input) end
         end
+        local resize=w.ResizeWindow
+        if resize and w.Visible then
+            local touch=resize.Input.UserInputType==Enum.UserInputType.Touch
+            if (touch and input==resize.Input) or (not touch and input.UserInputType==Enum.UserInputType.MouseMovement) then
+                local delta=input.Position-resize.Start
+                local dx,dy=delta.X/840,delta.Y/550
+                local change=math.abs(dx)>=math.abs(dy) and dx or dy
+                local bounds=w.Viewport.AbsoluteSize
+                local maxScale=math.min(0.95,(bounds.X-24)/840,(bounds.Y-24)/550)
+                maxScale=math.max(0.35,maxScale)
+                local minScale=math.min(0.45,maxScale)
+                local nextScale=math.clamp(resize.Scale+change,minScale,maxScale)
+                w.Settings.Scale=nextScale
+                w.Scale.Scale=nextScale
+                local half=w.Root.AbsoluteSize/2
+                local origin=w.Viewport.AbsolutePosition
+                local center=w.Root.AbsolutePosition+w.Root.AbsoluteSize/2
+                local x=math.clamp(center.X-origin.X,half.X,math.max(half.X,bounds.X-half.X))
+                local y=math.clamp(center.Y-origin.Y,half.Y,math.max(half.Y,bounds.Y-half.Y))
+                w.Root.Position=UDim2.fromOffset(x,y)
+                if w.SettingsControls and w.SettingsControls.Scale then
+                    w.SettingsControls.Scale:Set(nextScale,true)
+                end
+            end
+        end
         local drag=w.DragWindow
         if not drag or not w.Visible then return end
         local touch=drag.Input.UserInputType==Enum.UserInputType.Touch
@@ -2323,6 +2380,10 @@ function Library:CreateWindow(options)
     w:_connect(UIS.InputEnded,function(input)
         if w.DragSlider and input==w.DragSlider.Input then w.DragSlider=nil end
         if w.DragWindow and input==w.DragWindow.Input then w.DragWindow=nil end
+        if w.ResizeWindow and input==w.ResizeWindow.Input then
+            w.ResizeWindow=nil
+            w:_scheduleSave()
+        end
     end)
     w.Gui.Destroying:Connect(function() w:_teardown() end)
     w:SetToggleKey("RightShift");w:_fit()
@@ -2338,7 +2399,7 @@ function Library:CreateWindow(options)
     end)
     local controls={}
     w.SettingsControls=controls
-    local DEFAULTS={ToggleKey="RightShift",ClickSounds=true,Volume=0.45,Animations=true,Scale=0.88,Theme="Violet",Overlay=true,
+    local DEFAULTS={ToggleKey="RightShift",ClickSounds=true,Volume=0.45,Animations=true,Scale=0.78,Theme="Violet",Overlay=true,
         Blur=false,Tooltips=true,Notifications=true,NotifyDuration=3.5,Streamer=false,OpenOnLaunch=true}
     local input=settings:CreateSection({Name="Controls",Column="Left",Icon="keyboard"})
     w.KeyControl=input:CreateKeybind({Name="Toggle menu",CurrentKeybind="RightShift",
@@ -2373,7 +2434,7 @@ function Library:CreateWindow(options)
     controls.Theme=appearance:CreateDropdown({Name="Theme",Options=themeOptions,CurrentOption="Violet",
         Tooltip="Accent colors for the whole menu.",
         Callback=function(v) w:_setTheme(v);w:_scheduleSave() end})
-    controls.Scale=appearance:CreateSlider({Name="UI scale",Range={0.65,0.95},Increment=0.05,CurrentValue=0.88,
+    controls.Scale=appearance:CreateSlider({Name="UI scale",Range={0.45,0.95},Increment=0.05,CurrentValue=0.78,
         Tooltip="Makes the whole menu bigger or smaller.",Callback=function(v) w.Settings.Scale=v;w:_fit() end})
     controls.Animations=appearance:CreateToggle({Name="Smooth transitions",CurrentValue=true,
         Tooltip="Turn off for instant, animation-free UI.",Callback=function(v) w.Settings.Animations=v end})
