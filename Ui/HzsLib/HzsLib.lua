@@ -1889,7 +1889,7 @@ local function hexOf(color) return "#"..color:ToHex() end
 function Window:_buildOverlay()
     local player=Players.LocalPlayer
 
-    -- Thin horizontal status bar. It deliberately contains no active-feature list.
+    -- Compact FPS and ping bar, using the library's themed card background.
     local overlay=shaded(self.Viewport,UDim2.fromOffset(224,18),C.card1,C.card2)
     overlay.Name="HzsHubFPSBar"
     overlay.AnchorPoint=Vector2.new(0.5,0)
@@ -1903,12 +1903,29 @@ function Window:_buildOverlay()
     glowBorder(overlay,0.68)
     self.Overlay=overlay
 
-    local name=text(overlay,"Hzs-Hub",UDim2.fromOffset(57,18))
-    name.Position=UDim2.fromOffset(8,0)
+    -- H badge on the FPS bar.
+    local fpsBadge=shaded(overlay,UDim2.fromOffset(14,14),C.accentDim,C.pinkDim,45)
+    fpsBadge.Name="HzsHubFPSBadge"
+    fpsBadge.Position=UDim2.fromOffset(3,2)
+    fpsBadge.ZIndex=5
+    round(fpsBadge,4)
+    accentStroke(fpsBadge,0.55)
+    local fpsBadgeLetter=text(fpsBadge,"H",UDim2.fromScale(1,1))
+    fpsBadgeLetter.Font=F.bold
+    fpsBadgeLetter.TextSize=9
+    fpsBadgeLetter.TextColor3=C.white
+    fpsBadgeLetter.TextXAlignment=Enum.TextXAlignment.Center
+    fpsBadgeLetter.TextYAlignment=Enum.TextYAlignment.Center
+    fpsBadgeLetter.ZIndex=6
+    themedGradient(fpsBadgeLetter,function() return C.text,C.accent2 end,0)
+
+    local name=text(overlay,"Hzs-Hub",UDim2.fromOffset(43,18))
+    name.Position=UDim2.fromOffset(21,0)
     name.Font=F.bold
     name.TextSize=8
     name.TextColor3=C.white
     name.TextYAlignment=Enum.TextYAlignment.Center
+    name.ZIndex=5
     themedGradient(name,function() return C.text,C.accent end,0)
 
     local stats=text(overlay,"",UDim2.new(1,-116,1,0))
@@ -1918,6 +1935,7 @@ function Window:_buildOverlay()
     stats.RichText=true
     stats.TextXAlignment=Enum.TextXAlignment.Center
     stats.TextYAlignment=Enum.TextYAlignment.Center
+    stats.ZIndex=5
 
     local clock=text(overlay,"",UDim2.fromOffset(38,18))
     clock.AnchorPoint=Vector2.new(1,0)
@@ -1926,6 +1944,7 @@ function Window:_buildOverlay()
     clock.TextYAlignment=Enum.TextYAlignment.Center
     clock.TextSize=8
     clock.TextColor3=C.muted
+    clock.ZIndex=5
 
     local function placeReopen()
         local reopen=self.Reopen
@@ -2196,27 +2215,60 @@ function Library:CreateWindow(options)
     pad(keycap,6,6,0,0)
     w.Hint=text(keycap,"",UDim2.fromScale(0,1));w.Hint.AutomaticSize=Enum.AutomaticSize.X
     w.Hint.TextSize=11;w.Hint.Font=F.bold;w.Hint.TextColor3=C.sub
-    -- Reopen control is text-only: no H glyph, image, circle or icon.
+    -- Reopen button mirrors the FPS bar, in a smaller card with the same H badge.
     w.Reopen=new("TextButton",{
         Name="HzsHubReopenButton",
-        Text="Hzs-Hub",
-        Size=UDim2.fromOffset(76,20),
-        BackgroundTransparency=1,
+        Text="",
+        Size=UDim2.fromOffset(132,20),
         BackgroundColor3=C.white,
+        BackgroundTransparency=0.06,
         BorderSizePixel=0,
-        TextColor3=C.accent,
-        TextSize=10,
-        Font=F.bold,
-        TextXAlignment=Enum.TextXAlignment.Center,
-        TextYAlignment=Enum.TextYAlignment.Center,
-        TextStrokeTransparency=1,
         AutoButtonColor=false,
         Selectable=false,
         ZIndex=5,
+        ClipsDescendants=true,
     },w.Viewport)
-    themed(w.Reopen,function() w.Reopen.TextColor3=C.accent end)
+    gradient(w.Reopen,C.card1,C.card2,115)
+    round(w.Reopen,6)
+    glowBorder(w.Reopen,0.68)
+
+    local reopenBadge=shaded(w.Reopen,UDim2.fromOffset(14,14),C.accentDim,C.pinkDim,45)
+    reopenBadge.Name="HzsHubReopenBadge"
+    reopenBadge.Position=UDim2.fromOffset(4,3)
+    reopenBadge.ZIndex=6
+    round(reopenBadge,4)
+    accentStroke(reopenBadge,0.55)
+    local reopenLetter=text(reopenBadge,"H",UDim2.fromScale(1,1))
+    reopenLetter.Font=F.bold
+    reopenLetter.TextSize=9
+    reopenLetter.TextColor3=C.white
+    reopenLetter.TextXAlignment=Enum.TextXAlignment.Center
+    reopenLetter.TextYAlignment=Enum.TextYAlignment.Center
+    reopenLetter.ZIndex=7
+    themedGradient(reopenLetter,function() return C.text,C.accent2 end,0)
+
+    local reopenLabel=text(w.Reopen,"Hzs-Hub",UDim2.new(1,-43,1,0))
+    reopenLabel.Position=UDim2.fromOffset(23,0)
+    reopenLabel.Font=F.bold
+    reopenLabel.TextSize=9
+    reopenLabel.TextColor3=C.white
+    reopenLabel.TextYAlignment=Enum.TextYAlignment.Center
+    reopenLabel.ZIndex=6
+    themedGradient(reopenLabel,function() return C.text,C.accent end,0)
+
+    local reopenArrow=icon(w.Reopen,"chevron-up",10,C.accent)
+    reopenArrow.AnchorPoint=Vector2.new(1,0.5)
+    reopenArrow.Position=UDim2.new(1,-7,0.5,0)
+    reopenArrow.ZIndex=7
+
     w.Reopen.AnchorPoint=Vector2.new(0.5,0)
     w.Reopen.Position=UDim2.new(0.5,0,0,30)
+    w.Reopen.MouseEnter:Connect(function()
+        TweenService:Create(w.Reopen,TweenInfo.new(0.14),{BackgroundTransparency=0}):Play()
+    end)
+    w.Reopen.MouseLeave:Connect(function()
+        TweenService:Create(w.Reopen,TweenInfo.new(0.14),{BackgroundTransparency=0.06}):Play()
+    end)
     w.Reopen.Visible=false
     close.Activated:Connect(function()
         w:_click()
