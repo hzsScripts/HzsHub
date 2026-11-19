@@ -1881,7 +1881,7 @@ function Window:_buildOverlay()
     local player=Players.LocalPlayer
 
     -- Thin horizontal status bar. It deliberately contains no active-feature list.
-    local overlay=shaded(self.Viewport,UDim2.fromOffset(252,22),C.card1,C.card2)
+    local overlay=shaded(self.Viewport,UDim2.fromOffset(224,18),C.card1,C.card2)
     overlay.Name="HzsHubFPSBar"
     overlay.AnchorPoint=Vector2.new(0.5,0)
     overlay.Position=UDim2.new(0.5,0,0,5)
@@ -1894,28 +1894,28 @@ function Window:_buildOverlay()
     glowBorder(overlay,0.68)
     self.Overlay=overlay
 
-    local name=text(overlay,"Hzs-Hub",UDim2.fromOffset(57,22))
+    local name=text(overlay,"Hzs-Hub",UDim2.fromOffset(57,18))
     name.Position=UDim2.fromOffset(8,0)
     name.Font=F.bold
-    name.TextSize=9
+    name.TextSize=8
     name.TextColor3=C.white
     name.TextYAlignment=Enum.TextYAlignment.Center
     themedGradient(name,function() return C.text,C.accent end,0)
 
     local stats=text(overlay,"",UDim2.new(1,-116,1,0))
     stats.Position=UDim2.fromOffset(68,0)
-    stats.TextSize=9
+    stats.TextSize=8
     stats.TextColor3=C.sub
     stats.RichText=true
     stats.TextXAlignment=Enum.TextXAlignment.Center
     stats.TextYAlignment=Enum.TextYAlignment.Center
 
-    local clock=text(overlay,"",UDim2.fromOffset(38,22))
+    local clock=text(overlay,"",UDim2.fromOffset(38,18))
     clock.AnchorPoint=Vector2.new(1,0)
     clock.Position=UDim2.new(1,-7,0,0)
     clock.TextXAlignment=Enum.TextXAlignment.Right
     clock.TextYAlignment=Enum.TextYAlignment.Center
-    clock.TextSize=9
+    clock.TextSize=8
     clock.TextColor3=C.muted
 
     local function placeReopen()
@@ -2200,12 +2200,12 @@ function Library:CreateWindow(options)
     w.Reopen=new("TextButton",{
         Name="HzsHubReopenButton",
         Text="H",
-        Size=UDim2.fromOffset(24,24),
+        Size=UDim2.fromOffset(22,22),
         BackgroundTransparency=1,
         BackgroundColor3=C.white,
         BorderSizePixel=0,
         TextColor3=rgb(255,105,180),
-        TextSize=21,
+        TextSize=19,
         Font=F.bold,
         TextXAlignment=Enum.TextXAlignment.Center,
         TextYAlignment=Enum.TextYAlignment.Center,
