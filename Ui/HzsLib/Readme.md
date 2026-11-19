@@ -1,3 +1,3 @@
 ## Hzs Lib v2.0.8 Is Live 🔥🔥🔥
-## CoreGui By github.com/tlredz
-## Modified By Me
+## CoreGui By me github.com/hzsscripts |(Nzx)
+## Somen Changes in Ui
