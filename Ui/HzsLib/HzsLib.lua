@@ -1879,59 +1879,50 @@ end
 local function hexOf(color) return "#"..color:ToHex() end
 function Window:_buildOverlay()
     local player=Players.LocalPlayer
-    local overlay=shaded(self.Viewport,UDim2.fromOffset(164,0),C.card1,C.card2)
-    overlay.AutomaticSize=Enum.AutomaticSize.Y;overlay.AnchorPoint=Vector2.new(0.5,0)
-    overlay.Position=UDim2.new(0.5,0,0,0);overlay.Active=true;overlay.ZIndex=4
-    overlay.BackgroundTransparency=0.05;overlay.Visible=self.Settings.Overlay~=false
-    round(overlay,10);glowBorder(overlay,0.5);pad(overlay,8,8,7,8);stack(overlay,4)
+    local overlay=shaded(self.Viewport,UDim2.fromOffset(286,30),C.card1,C.card2)
+    overlay.AnchorPoint=Vector2.new(0.5,0)
+    overlay.Position=UDim2.new(0.5,0,0,8)
+    overlay.Active=false;overlay.ZIndex=4
+    overlay.BackgroundTransparency=0.04
+    overlay.Visible=self.Settings.Overlay~=false
+    round(overlay,8);glowBorder(overlay,0.58)
     self.Overlay=overlay
-    local head=frame(overlay,UDim2.new(1,0,0,18));head.BackgroundTransparency=1;head.LayoutOrder=1
-    local logoBadge=frame(head,UDim2.fromOffset(17,17),C.accentDim);logoBadge.Position=UDim2.fromOffset(0,0);round(logoBadge,5)
-    local logoLetter=text(logoBadge,"H",UDim2.fromScale(1,1));logoLetter.Font=F.bold;logoLetter.TextSize=12;logoLetter.TextColor3=C.white
-    themed(logoBadge,function() logoBadge.BackgroundColor3=C.accent end)
-    local name=text(head,"Hzs-Hub",UDim2.new(1,-74,1,0));name.Position=UDim2.fromOffset(22,0)
-    name.Font=F.bold;name.TextSize=12;name.TextColor3=C.white
+
+    -- Slim, single-line FPS bar: no active-feature list or status labels.
+    local logo=text(overlay,"H",UDim2.fromOffset(15,30))
+    logo.Position=UDim2.fromOffset(8,0)
+    logo.Font=F.bold;logo.TextSize=17;logo.TextColor3=rgb(255,105,180)
+    logo.TextXAlignment=Enum.TextXAlignment.Center
+
+    local name=text(overlay,"Hzs-Hub",UDim2.fromOffset(54,30))
+    name.Position=UDim2.fromOffset(25,0)
+    name.Font=F.bold;name.TextSize=10;name.TextColor3=C.white
     themedGradient(name,function() return C.text,C.accent end,0)
-    local clock=text(head,"",UDim2.fromOffset(48,18));clock.AnchorPoint=Vector2.new(1,0);clock.Position=UDim2.new(1,0,0,0)
-    clock.TextXAlignment=Enum.TextXAlignment.Right;clock.TextSize=11;clock.TextColor3=C.muted
-    local stats=text(overlay,"",UDim2.new(1,0,0,16));stats.LayoutOrder=2;stats.TextSize=11;stats.TextColor3=C.sub
-    stats.RichText=true
-    local rule=frame(overlay,UDim2.new(1,0,0,1),C.white);rule.LayoutOrder=3
-    themedGradient(rule,function() return C.accent,C.line end,0,0.55,0.4)
-    local list=frame(overlay,UDim2.new(1,0,0,0));list.BackgroundTransparency=1;list.LayoutOrder=4
-    list.AutomaticSize=Enum.AutomaticSize.Y;stack(list,4)
+
+    local stats=text(overlay,"",UDim2.new(1,-144,1,0))
+    stats.Position=UDim2.fromOffset(82,0)
+    stats.TextSize=10;stats.TextColor3=C.sub;stats.RichText=true
+    stats.TextXAlignment=Enum.TextXAlignment.Center
+
+    local clock=text(overlay,"",UDim2.fromOffset(42,30))
+    clock.AnchorPoint=Vector2.new(1,0)
+    clock.Position=UDim2.new(1,-8,0,0)
+    clock.TextXAlignment=Enum.TextXAlignment.Right
+    clock.TextSize=10;clock.TextColor3=C.muted
+
     local function placeReopen()
         local reopen=self.Reopen
         if not reopen or not reopen.Parent then return end
         local overlayPos=overlay.AbsolutePosition-self.Viewport.AbsolutePosition
         local overlaySize=overlay.AbsoluteSize
         reopen.AnchorPoint=Vector2.new(0.5,0)
-        reopen.Position=UDim2.fromOffset(overlayPos.X+overlaySize.X/2,overlayPos.Y+overlaySize.Y+8)
+        reopen.Position=UDim2.fromOffset(overlayPos.X+overlaySize.X/2,overlayPos.Y+overlaySize.Y+5)
     end
     self:_connect(overlay:GetPropertyChangedSignal("AbsoluteSize"),placeReopen)
     self:_connect(overlay:GetPropertyChangedSignal("AbsolutePosition"),placeReopen)
     self:_connect(self.Viewport:GetPropertyChangedSignal("AbsoluteSize"),placeReopen)
     task.defer(placeReopen)
-    local lastKey
-    local function rebuild(names)
-        for _,child in ipairs(list:GetChildren()) do
-            if not child:IsA("UIListLayout") then child:Destroy() end
-        end
-        if #names==0 then
-            local empty=text(list,"No active features",UDim2.new(1,0,0,16));empty.TextSize=11;empty.TextColor3=C.dim
-            return
-        end
-        for i=1,math.min(8,#names) do
-            local item=frame(list,UDim2.new(1,0,0,16));item.BackgroundTransparency=1;item.LayoutOrder=i
-            local dot=frame(item,UDim2.fromOffset(5,5),C.white);dot.Position=UDim2.fromOffset(1,6);round(dot,"full");accentFill(dot,45)
-            local label=text(item,names[i],UDim2.new(1,-12,1,0));label.Position=UDim2.fromOffset(12,0)
-            label.TextSize=12;label.TextColor3=C.text2
-        end
-        if #names>8 then
-            local more=text(list,"+"..(#names-8).." more",UDim2.new(1,0,0,14));more.LayoutOrder=99
-            more.TextSize=11;more.TextColor3=C.dim
-        end
-    end
+
     local function update(fps)
         if not overlay.Visible then return end
         local t=os.date("*t")
@@ -1939,21 +1930,16 @@ function Window:_buildOverlay()
         local good,okay,bad=hexOf(rgb(98,206,140)),hexOf(rgb(224,190,84)),hexOf(C.danger)
         local fpsColor=fps>=55 and good or fps>=30 and okay or bad
         local okPing,ping=pcall(function() return player:GetNetworkPing()*1000 end)
-        local pingText="- ms"
+        local pingValue="-"
+        local pingColor=hexOf(C.dim)
         if okPing then
-            pingText=string.format('<font color="%s">%d</font> ms',ping<80 and good or ping<160 and okay or bad,math.floor(ping))
+            pingValue=tostring(math.floor(ping+0.5))
+            pingColor=ping<80 and good or ping<160 and okay or bad
         end
-        stats.Text=string.format('<font color="%s">%d</font> FPS   <font color="%s">/</font>   %s',fpsColor,math.floor(fps+0.5),hexOf(C.dim),pingText)
-        local names={}
-        for _,entry in ipairs(self.Toggles) do
-            if entry.Control.Value==true and entry.Tab~=self.SettingsTab and entry.Tab~=self.DashboardTab
-                and entry.Control.Instance.Parent then
-                table.insert(names,entry.Name)
-            end
-        end
-        local key=table.concat(names,"\n")
-        if key~=lastKey then lastKey=key;rebuild(names) end
+        stats.Text=string.format('<font color="%s">%d FPS</font>  <font color="%s">·</font>  <font color="%s">%s ms</font>',
+            fpsColor,math.floor(fps+0.5),hexOf(C.dim),pingColor,pingValue)
     end
+
     local frames,fpsClock,fps,elapsed=0,os.clock(),60,1
     self:_connect(RunService.RenderStepped,function(dt)
         frames=frames+1
@@ -2189,14 +2175,14 @@ function Library:CreateWindow(options)
     pad(keycap,6,6,0,0)
     w.Hint=text(keycap,"",UDim2.fromScale(0,1));w.Hint.AutomaticSize=Enum.AutomaticSize.X
     w.Hint.TextSize=11;w.Hint.Font=F.bold;w.Hint.TextColor3=C.sub
-    w.Reopen=button(w.Viewport,"",UDim2.fromOffset(150,38))
-    w.Reopen.AnchorPoint=Vector2.new(0.5,0);w.Reopen.Position=UDim2.new(0.5,0,0,8);w.Reopen.BackgroundColor3=C.white;w.Reopen.Visible=false
-    gradient(w.Reopen,C.side1,C.side2,90);round(w.Reopen,11);accentStroke(w.Reopen,0.5)
-    local reopenBadge=frame(w.Reopen,UDim2.fromOffset(23,23),C.accent);reopenBadge.Position=UDim2.fromOffset(9,7);round(reopenBadge,7)
-    local reopenLetter=text(reopenBadge,"H",UDim2.fromScale(1,1));reopenLetter.Font=F.bold;reopenLetter.TextSize=16;reopenLetter.TextColor3=C.white
-    themed(reopenBadge,function() reopenBadge.BackgroundColor3=C.accent end)
-    local reopenText=text(w.Reopen,"Hzs-Hub",UDim2.new(1,-46,1,0));reopenText.Position=UDim2.fromOffset(39,0)
-    reopenText.Font=F.bold;reopenText.TextColor3=C.white;themedGradient(reopenText,function() return C.text,C.accent end,0)
+    w.Reopen=button(w.Viewport,"H",UDim2.fromOffset(34,30))
+    w.Reopen.AnchorPoint=Vector2.new(0.5,0);w.Reopen.Position=UDim2.new(0.5,0,0,8)
+    w.Reopen.BackgroundTransparency=1;w.Reopen.Visible=false;w.Reopen.AutoButtonColor=false
+    w.Reopen.Text="H";w.Reopen.Font=F.bold;w.Reopen.TextSize=23
+    w.Reopen.TextColor3=rgb(255,105,180);w.Reopen.TextStrokeTransparency=1
+    for _,child in ipairs(w.Reopen:GetChildren()) do
+        if child:IsA("UICorner") or child:IsA("UIStroke") or child:IsA("UIGradient") then child:Destroy() end
+    end
     close.Activated:Connect(function()
         w:_click()
         w:Confirm({Title="Close Hzs-Hub?",ConfirmText="Close",Danger=true,
@@ -2311,7 +2297,7 @@ function Library:CreateWindow(options)
         Tooltip="Hints like this one when you hover a setting.",
         Callback=function(v) w.Settings.Tooltips=v;w:_applyTooltips();w:_scheduleSave() end})
     controls.Overlay=appearance:CreateToggle({Name="Overlay",CurrentValue=true,
-        Tooltip="Compact, fixed panel with FPS, ping and active features.",
+        Tooltip="Thin horizontal bar showing FPS, ping and the clock.",
         Callback=function(v) w.Settings.Overlay=v;if w.Overlay then w.Overlay.Visible=v end;w:_scheduleSave() end})
     appearance:CreateButton({Name="Reset UI settings",Icon="rotate-ccw",Tooltip="Everything on this tab goes back to default.",Callback=function()
         w:Confirm({Title="Reset UI settings?",Content="All appearance options on this tab go back to default. Your feature settings and configs stay.",
